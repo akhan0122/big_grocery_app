@@ -9,7 +9,7 @@ import 'package:get/get.dart';
 
 // screens
 import 'package:biggroceryapp/features/splash/presentation/splash_screen.dart';
-import 'package:biggroceryapp/features/authentication/presentation/authentication_screen.dart';
+import 'package:biggroceryapp/features/authentication/presentation/welcome_screen.dart';
 import 'package:biggroceryapp/features/home/presentation/home_screen.dart';
 
 // controllers

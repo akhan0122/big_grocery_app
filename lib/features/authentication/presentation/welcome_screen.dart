@@ -42,7 +42,7 @@ class AuthenticationScreen extends StatelessWidget {
                 height: screenHeight * 0.58,
                 width: double.infinity,
                 child: Image.asset(
-                  AssetPng.signUpBackground,
+                  AssetPng.register,
                   fit: BoxFit.cover,
                   errorBuilder: (context, error, stackTrace) => Container(
                     color: Colors.grey[300],

@@ -34,7 +34,7 @@ class HomeController extends GetxController {
     if (currentPage < imagesList.length - 1) {
       pageController.nextPage(
         duration: const Duration(milliseconds: 400),
-        curve: Curves.easeIn,
+        curve: Curves.easeOut,
       );
     } else {
       AppRouter.go(AppRoutes.authentication);
@@ -48,4 +48,3 @@ class HomeController extends GetxController {
     super.onClose();
   }
 }
-
