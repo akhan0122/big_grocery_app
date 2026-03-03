@@ -10,8 +10,8 @@ import 'package:biggroceryapp/core/utils/theme/assets_class/asset_png.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-class LoginScreen extends StatelessWidget {
-  const LoginScreen({super.key});
+class SignUpScreen extends StatelessWidget {
+  const SignUpScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -19,7 +19,7 @@ class LoginScreen extends StatelessWidget {
       extendBodyBehindAppBar: true,
       appBar: AppBarWidget(
         backgroundColor: Colors.transparent,
-        title: 'Login',
+        title: 'Welcome',
         showBackButton: true,
         backIconColor: Colors.white,
         titleColor: Colors.white,
@@ -77,6 +77,13 @@ class LoginScreen extends StatelessWidget {
                   ),
                   SizedBox(height: 14.h),
 
+                  TextFormFieldWidget(
+                    controller: TextEditingController(),
+                    hintText: 'Phone Number',
+                    prefixIcon: Icons.phone,
+                    keyboardType: TextInputType.emailAddress,
+                  ),
+                  SizedBox(height: 14.h),
                   // ── Password field ────────────────────────
                   TextFormFieldWidget(
                     controller: TextEditingController(),
@@ -84,36 +91,7 @@ class LoginScreen extends StatelessWidget {
                     prefixIcon: Icons.lock_outline,
                     isPassword: true,
                   ),
-                  SizedBox(height: 16.h),
 
-                  // ── Remember me + Forgot password ─────────
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Row(
-                        children: [
-                          AppToggleWidget(value: false, onChanged: (val) {}),
-
-                          SizedBox(width: 6.w),
-                          AppText(
-                            text: 'Remember me',
-                            style: TextStyle(
-                              fontSize: 13.sp,
-                              color: AppColors.textSecondary,
-                            ),
-                          ),
-                        ],
-                      ),
-                      AppText(
-                        text: 'Forgot password',
-                        style: TextStyle(
-                          fontSize: 13.sp,
-                          color: AppColors.primary,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ],
-                  ),
                   SizedBox(height: 24.h),
 
                   // ── Login button ──────────────────────────
@@ -131,18 +109,18 @@ class LoginScreen extends StatelessWidget {
                   Center(
                     child: GestureDetector(
                       onTap: () {
-                        AppRouter.push(AppRoutes.signUpScreen);
+                        AppRouter.push(AppRoutes.loginScreen);
                       },
                       child: RichText(
                         text: TextSpan(
-                          text: "Don't have an account? ",
+                          text: 'Already have an account? ',
                           style: TextStyle(
                             fontSize: 13.sp,
                             color: AppColors.textSecondary,
                           ),
                           children: [
                             TextSpan(
-                              text: 'Sign up',
+                              text: 'Login',
                               style: TextStyle(
                                 fontSize: 13.sp,
                                 color: AppColors.primary,

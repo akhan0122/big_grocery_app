@@ -1,6 +1,7 @@
 // lib/core/routes/app_router.dart
 import 'package:biggroceryapp/core/services/observer_router.dart';
 import 'package:biggroceryapp/core/utils/app_routes.dart';
+import 'package:biggroceryapp/features/authentication/presentation/create_account.dart';
 import 'package:biggroceryapp/features/authentication/presentation/login_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -50,6 +51,16 @@ class AppRouter {
         path: AppRoutes.loginScreen,
         name: 'login',
         builder: (context, state) => const LoginScreen(),
+        redirect: (context, state) {
+          _register<AuthenticationController>(() => AuthenticationController());
+          return null;
+        },
+      ),
+
+      GoRoute(
+        path: AppRoutes.signUpScreen,
+        name: 'signup',
+        builder: (context, state) => const SignUpScreen(),
         redirect: (context, state) {
           _register<AuthenticationController>(() => AuthenticationController());
           return null;

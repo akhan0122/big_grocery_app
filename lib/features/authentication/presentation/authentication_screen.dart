@@ -123,7 +123,9 @@ class AuthenticationScreen extends StatelessWidget {
                         ),
                         const SizedBox(height: 14),
                         AppElevatedButton(
-                          onPressed: () {},
+                          onPressed: () {
+                            AppRouter.push(AppRoutes.signUpScreen);
+                          },
                           title: 'Create an account',
                           height: 50,
                           borderRadius: BorderRadius.circular(12),
