@@ -1,4 +1,3 @@
-import 'package:biggroceryapp/core/services/app_bindings.dart';
 import 'package:biggroceryapp/core/services/app_router.dart';
 import 'package:biggroceryapp/core/utils/text_values.dart';
 import 'package:biggroceryapp/core/utils/theme/theme.dart.dart';
@@ -12,7 +11,7 @@ void main() {
   if (kIsWeb) {
     usePathUrlStrategy();
   }
-  AppBindings().dependencies();
+
   runApp(const MyApp());
 }
 

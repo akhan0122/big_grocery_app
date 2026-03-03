@@ -17,4 +17,9 @@ class AppColors {
   static const Color primaryDark = Color(0xFF6CC51D);
   static const Color primaryLight = Color(0xFFEBFFD7);
   static const Color hintFont = Color(0xFF868889);
+
+  static const Color inputFieldFill = Color(0xFFF2F2F2);
+  static const Color inputFieldText = Color(0xFF777777);
+  static const Color inputFieldHint = Color(0xFFB0B0B0);
+  static const Color inputFieldIcon = Color(0xFF8A8A8A);
 }

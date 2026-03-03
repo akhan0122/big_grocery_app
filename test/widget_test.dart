@@ -1,4 +1,4 @@
-import 'package:biggroceryapp/core/services/app_bindings.dart';
+// import 'package:biggroceryapp/core/services/app_bindings.dart';
 import 'package:biggroceryapp/main.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -6,7 +6,7 @@ void main() {
   testWidgets('Splash loads then navigates to home', (
     WidgetTester tester,
   ) async {
-    AppBindings().dependencies();
+    // AppBindings().dependencies();
 
     await tester.pumpWidget(const MyApp());
 

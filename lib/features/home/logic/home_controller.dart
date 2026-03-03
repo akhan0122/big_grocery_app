@@ -1,3 +1,5 @@
+import 'package:biggroceryapp/core/services/app_router.dart';
+import 'package:biggroceryapp/core/utils/app_routes.dart';
 import 'package:biggroceryapp/core/utils/theme/assets_class/asset_png.dart';
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
@@ -35,7 +37,7 @@ class HomeController extends GetxController {
         curve: Curves.easeIn,
       );
     } else {
-      debugPrint('New page');
+      AppRouter.go(AppRoutes.authentication);
     }
   }
 
@@ -46,3 +48,4 @@ class HomeController extends GetxController {
     super.onClose();
   }
 }
+
