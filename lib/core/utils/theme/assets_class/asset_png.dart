@@ -7,4 +7,5 @@ class AssetPng {
   static const String loginCover = 'assets/png/login_cover.png';
   static const String register = 'assets/png/registration.png';
   static const String signIn = 'assets/png/sign_up.png';
+  static const String homescreen = 'assets/png/homescreen.png';
 }

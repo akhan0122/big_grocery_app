@@ -1,13 +1,13 @@
 // lib/core/routes/app_router_observer.dart
 
+import 'package:biggroceryapp/features/home/logic/home_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:biggroceryapp/features/splash/logic/splash_controller.dart';
-import 'package:biggroceryapp/features/home/logic/home_controller.dart';
+import 'package:biggroceryapp/features/landing/logic/landing_controller.dart';
 import 'package:biggroceryapp/features/authentication/logic/authentication_controller.dart';
 
 class AppRouterObserver extends NavigatorObserver {
-
   // WHY didPop: fires when user goes BACK (pops a screen)
   @override
   void didPop(Route route, Route? previousRoute) {
@@ -41,6 +41,9 @@ class AppRouterObserver extends NavigatorObserver {
         break;
       case 'home':
         _delete<HomeController>();
+        break;
+      case 'landing':
+        _delete<LandingController>();
         break;
       case 'authentication':
       case 'login':

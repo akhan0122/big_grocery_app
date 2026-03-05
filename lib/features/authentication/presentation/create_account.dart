@@ -1,7 +1,6 @@
 import 'package:biggroceryapp/core/global_widgets/app_elevated_button.dart';
 import 'package:biggroceryapp/core/global_widgets/app_text.dart';
 import 'package:biggroceryapp/core/global_widgets/custom_appbar_widget.dart';
-import 'package:biggroceryapp/core/global_widgets/switch_widget.dart';
 import 'package:biggroceryapp/core/global_widgets/text_form_field_widget.dart';
 import 'package:biggroceryapp/core/services/app_router.dart';
 import 'package:biggroceryapp/core/utils/app_colors.dart';

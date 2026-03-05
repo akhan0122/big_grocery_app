@@ -11,7 +11,7 @@ class SplashController extends GetxController {
   void onInit() {
     super.onInit();
     _timer = Timer(const Duration(seconds: 2), () {
-      AppRouter.go(AppRoutes.home);
+      AppRouter.go(AppRoutes.landing);
     });
   }
 

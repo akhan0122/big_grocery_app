@@ -119,6 +119,9 @@ class LoginScreen extends StatelessWidget {
                   // ── Login button ──────────────────────────
                   AppElevatedButton(
                     title: "Sign In",
+                    onPressed: () {
+                      AppRouter.push(AppRoutes.homeScreen);
+                    },
                     titleStyle: TextStyle(
                       color: Colors.white,
                       fontSize: 18.sp,

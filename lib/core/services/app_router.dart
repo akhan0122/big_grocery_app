@@ -3,6 +3,8 @@ import 'package:biggroceryapp/core/services/observer_router.dart';
 import 'package:biggroceryapp/core/utils/app_routes.dart';
 import 'package:biggroceryapp/features/authentication/presentation/create_account.dart';
 import 'package:biggroceryapp/features/authentication/presentation/login_screen.dart';
+import 'package:biggroceryapp/features/home/logic/home_controller.dart';
+import 'package:biggroceryapp/features/home/presentation/home_sceen.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:get/get.dart';
@@ -10,12 +12,12 @@ import 'package:get/get.dart';
 // screens
 import 'package:biggroceryapp/features/splash/presentation/splash_screen.dart';
 import 'package:biggroceryapp/features/authentication/presentation/welcome_screen.dart';
-import 'package:biggroceryapp/features/home/presentation/home_screen.dart';
+import 'package:biggroceryapp/features/landing/presentation/landing_screen.dart';
 
 // controllers
 import 'package:biggroceryapp/features/splash/logic/splash_controller.dart';
 import 'package:biggroceryapp/features/authentication/logic/authentication_controller.dart';
-import 'package:biggroceryapp/features/home/logic/home_controller.dart';
+import 'package:biggroceryapp/features/landing/logic/landing_controller.dart';
 
 class AppRouter {
   AppRouter._();
@@ -68,8 +70,18 @@ class AppRouter {
       ),
 
       GoRoute(
-        path: AppRoutes.home,
-        name: 'home',
+        path: AppRoutes.landing,
+        name: 'landing',
+        builder: (context, state) => const LandingScreen(),
+        redirect: (context, state) {
+          _register<LandingController>(() => LandingController());
+          return null;
+        },
+      ),
+
+      GoRoute(
+        path: AppRoutes.homeScreen,
+        name: AppRoutes.homeScreen,
         builder: (context, state) => const HomeScreen(),
         redirect: (context, state) {
           _register<HomeController>(() => HomeController());
