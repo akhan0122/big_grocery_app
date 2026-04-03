@@ -25,12 +25,12 @@ class AppBarWidget extends StatelessWidget implements PreferredSizeWidget {
     this.onFilterTap,
     this.onBackTap,
     // ── All colors optional with smart defaults ──────────────
-    this.backgroundColor,       // null = uses theme default
-    this.titleColor,            // null = AppColors.textPrimary
-    this.iconColor,             // null = AppColors.textPrimary
-    this.badgeColor,            // null = AppColors.primary
-    this.badgeTextColor,        // null = Colors.white
-    this.backIconColor,         // null = falls back to iconColor
+    this.backgroundColor, // null = uses theme default
+    this.titleColor, // null = AppColors.textPrimary
+    this.iconColor, // null = AppColors.textPrimary
+    this.badgeColor, // null = AppColors.primary
+    this.badgeTextColor, // null = Colors.white
+    this.backIconColor, // null = falls back to iconColor
     // ─────────────────────────────────────────────────────────
     this.centerTitle = true,
     this.elevation = 0,
@@ -58,18 +58,18 @@ class AppBarWidget extends StatelessWidget implements PreferredSizeWidget {
   final Color? iconColor;
   final Color? badgeColor;
   final Color? badgeTextColor;
-  final Color? backIconColor;    // WHY separate: sometimes back arrow
-                                 // needs different color (transparent appbars)
+  final Color? backIconColor; // WHY separate: sometimes back arrow
+  // needs different color (transparent appbars)
   final bool centerTitle;
   final double elevation;
 
   // ── Internal color resolvers ─────────────────────────────────
   // WHY: centralize fallback logic — don't repeat ?? everywhere in build()
-  Color get _iconColor        => iconColor ?? AppColors.textPrimary;
-  Color get _titleColor       => titleColor ?? AppColors.textPrimary;
-  Color get _badgeColor       => badgeColor ?? AppColors.primary;
-  Color get _badgeTextColor   => badgeTextColor ?? Colors.white;
-  Color get _backIconColor    => backIconColor ?? _iconColor;
+  Color get _iconColor => iconColor ?? AppColors.textPrimary;
+  Color get _titleColor => titleColor ?? AppColors.textPrimary;
+  Color get _badgeColor => badgeColor ?? AppColors.primary;
+  Color get _badgeTextColor => badgeTextColor ?? Colors.white;
+  Color get _backIconColor => backIconColor ?? _iconColor;
   // backgroundColor stays nullable — null lets AppBar use theme color
 
   @override
@@ -78,8 +78,8 @@ class AppBarWidget extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     return AppBar(
-      backgroundColor: backgroundColor,  // null = theme default ✅
-      elevation: elevation,
+      backgroundColor: backgroundColor, // null = theme default ✅
+      elevation: 0,
       centerTitle: centerTitle,
       automaticallyImplyLeading: false,
 
@@ -89,21 +89,22 @@ class AppBarWidget extends StatelessWidget implements PreferredSizeWidget {
               onPressed: onBackTap ?? () => Navigator.of(context).pop(),
               icon: Icon(
                 Icons.arrow_back_rounded,
-                color: _backIconColor,    // ← uses resolver
+                color: _backIconColor, // ← uses resolver
                 size: 25.r,
               ),
             )
           : null,
 
       // ── Title ─────────────────────────────────────────────
-      title: titleWidget ??
+      title:
+          titleWidget ??
           (title != null
               ? Text(
                   title!,
                   style: TextStyle(
                     fontSize: 18.sp,
                     fontWeight: FontWeight.w600,
-                    color: _titleColor,   // ← uses resolver
+                    color: _titleColor, // ← uses resolver
                   ),
                 )
               : null),
@@ -115,7 +116,7 @@ class AppBarWidget extends StatelessWidget implements PreferredSizeWidget {
             icon: Icons.notifications_outlined,
             count: notificationCount,
             onTap: onNotificationTap,
-            iconColor: _iconColor,        // ← passed down
+            iconColor: _iconColor, // ← passed down
             badgeColor: _badgeColor,
             badgeTextColor: _badgeTextColor,
           ),
@@ -133,7 +134,7 @@ class AppBarWidget extends StatelessWidget implements PreferredSizeWidget {
             onPressed: onFilterTap,
             icon: Icon(
               Icons.tune,
-              color: _iconColor,          // ← uses resolver
+              color: _iconColor, // ← uses resolver
               size: 22.r,
             ),
           ),
@@ -149,7 +150,7 @@ class _BadgeIconButton extends StatelessWidget {
     required this.icon,
     required this.count,
     this.onTap,
-    this.iconColor,         // ← optional, from parent
+    this.iconColor, // ← optional, from parent
     this.badgeColor,
     this.badgeTextColor,
   });
@@ -170,7 +171,7 @@ class _BadgeIconButton extends StatelessWidget {
           onPressed: onTap,
           icon: Icon(
             icon,
-            color: iconColor ?? AppColors.textPrimary,  // ← safe fallback
+            color: iconColor ?? AppColors.textPrimary, // ← safe fallback
             size: 24.r,
           ),
         ),
@@ -184,10 +185,7 @@ class _BadgeIconButton extends StatelessWidget {
                 color: badgeColor ?? AppColors.primary, // ← safe fallback
                 shape: BoxShape.circle,
               ),
-              constraints: BoxConstraints(
-                minWidth: 16.r,
-                minHeight: 16.r,
-              ),
+              constraints: BoxConstraints(minWidth: 16.r, minHeight: 16.r),
               child: Text(
                 count > 99 ? '99+' : '$count',
                 style: TextStyle(

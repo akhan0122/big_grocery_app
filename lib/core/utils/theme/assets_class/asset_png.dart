@@ -8,4 +8,5 @@ class AssetPng {
   static const String register = 'assets/png/registration.png';
   static const String signIn = 'assets/png/sign_up.png';
   static const String homescreen = 'assets/png/homescreen.png';
+  static const String lime = 'assets/png/lime.png';
 }
