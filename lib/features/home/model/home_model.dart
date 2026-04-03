@@ -1,15 +1,21 @@
-// lib/features/home/data/models/product_model.dart
-
 class ProductModel {
   final int id;
   final String name;
   final String imageUrl;
   final double price;
-  final String weight; // "1.50 lbs"
-  final bool isNew; // shows "NEW" badge
-  final bool isFavorite; // heart icon state
-  final String? discountLabel; // future: "20% OFF" badge
-  final double? originalPrice; // future: strikethrough price
+  final String weight;
+
+  // UI states
+  final bool isNew;
+  final bool isFavorite;
+
+  // CART states (IMPORTANT)
+  final bool isAddedToCart;
+  final int quantity;
+
+  // Future use
+  final String? discountLabel;
+  final double? originalPrice;
 
   const ProductModel({
     required this.id,
@@ -19,13 +25,15 @@ class ProductModel {
     required this.weight,
     this.isNew = false,
     this.isFavorite = false,
+    this.isAddedToCart = false,
+    this.quantity = 0,
     this.discountLabel,
     this.originalPrice,
   });
 
-  // WHY copyWith: never mutate original object
-  // creates NEW object with changed fields
-  // GetX .obs works best with immutable models
+  // 🔥 Important fix for nullable handling
+  static const _unset = Object();
+
   ProductModel copyWith({
     int? id,
     String? name,
@@ -34,8 +42,10 @@ class ProductModel {
     String? weight,
     bool? isNew,
     bool? isFavorite,
-    String? discountLabel,
-    double? originalPrice,
+    bool? isAddedToCart,
+    int? quantity,
+    Object? discountLabel = _unset,
+    Object? originalPrice = _unset,
   }) {
     return ProductModel(
       id: id ?? this.id,
@@ -45,28 +55,34 @@ class ProductModel {
       weight: weight ?? this.weight,
       isNew: isNew ?? this.isNew,
       isFavorite: isFavorite ?? this.isFavorite,
-      discountLabel: discountLabel ?? this.discountLabel,
-      originalPrice: originalPrice ?? this.originalPrice,
+      isAddedToCart: isAddedToCart ?? this.isAddedToCart,
+      quantity: quantity ?? this.quantity,
+      discountLabel: discountLabel == _unset
+          ? this.discountLabel
+          : discountLabel as String?,
+      originalPrice: originalPrice == _unset
+          ? this.originalPrice
+          : originalPrice as double?,
     );
   }
 
-  // WHY fromJson: when you connect real API later
-  // just change this one method — rest of app untouched
+  // ✅ Safe JSON parsing
   factory ProductModel.fromJson(Map<String, dynamic> json) {
     return ProductModel(
-      id: json['id'] as int,
+      id: (json['id'] as num).toInt(),
       name: json['name'] as String,
       imageUrl: json['image_url'] as String,
       price: (json['price'] as num).toDouble(),
       weight: json['weight'] as String,
       isNew: json['is_new'] as bool? ?? false,
       isFavorite: json['is_favorite'] as bool? ?? false,
+      isAddedToCart: json['is_added_to_cart'] as bool? ?? false,
+      quantity: json['quantity'] as int? ?? 0,
       discountLabel: json['discount_label'] as String?,
       originalPrice: (json['original_price'] as num?)?.toDouble(),
     );
   }
 
-  // WHY toJson: when you send data TO api
   Map<String, dynamic> toJson() {
     return {
       'id': id,
@@ -76,20 +92,18 @@ class ProductModel {
       'weight': weight,
       'is_new': isNew,
       'is_favorite': isFavorite,
+      'is_added_to_cart': isAddedToCart,
+      'quantity': quantity,
       'discount_label': discountLabel,
       'original_price': originalPrice,
     };
   }
 
-  // WHY toString: makes debugging easy
-  // print(product) shows readable info not "Instance of ProductModel"
   @override
   String toString() {
-    return 'ProductModel(id: $id, name: $name, price: $price)';
+    return 'ProductModel(id: $id, name: $name, qty: $quantity)';
   }
 
-  // WHY == and hashCode: lets you compare products
-  // products.contains(product) works correctly
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
