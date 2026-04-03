@@ -7,7 +7,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class ProductDetailScreen extends StatelessWidget {
-  const ProductDetailScreen({super.key});
+  final VoidCallback? onTap;
+  const ProductDetailScreen({super.key, this.onTap});
 
   @override
   Widget build(BuildContext context) {
