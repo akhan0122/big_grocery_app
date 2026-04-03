@@ -152,7 +152,11 @@ class HomeScreen extends StatelessWidget {
 
                                     return InkWell(
                                       onTap: () {
-                                        AppRouter.push(AppRoutes.productDetails);
+                                        AppRouter.push(
+                                          AppRoutes.productDetailsById(
+                                            product.id,
+                                          ),
+                                        );
                                       },
                                       child: ProductCard(
                                         name: product.name,

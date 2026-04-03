@@ -114,44 +114,57 @@ class HomeController extends GetxController {
     ),
   ];
 
-  void toggleFavorite(ProductModel product) {
+  ProductModel? findProductById(int id) {
+    for (final product in dummyProducts) {
+      if (product.id == id) return product;
+    }
+    return null;
+  }
+
+  void _updateProduct(ProductModel product, ProductModel updatedProduct) {
     final index = dummyProducts.indexWhere((item) => item.id == product.id);
     if (index == -1) return;
+    dummyProducts[index] = updatedProduct;
+    update(['product_$index', 'product_detail_${product.id}']);
+  }
 
-    dummyProducts[index] = dummyProducts[index].copyWith(
-      isFavorite: !dummyProducts[index].isFavorite,
+  void toggleFavorite(ProductModel product) {
+    _updateProduct(
+      product,
+      product.copyWith(
+        isFavorite: !product.isFavorite,
+      ),
     );
-    update(['product_$index']);
   }
 
   void addToCart(ProductModel product) {
-    final index = dummyProducts.indexWhere((item) => item.id == product.id);
-    if (index == -1) return;
-    dummyProducts[index] = dummyProducts[index].copyWith(
-      quantity: product.quantity + 1,
-      isAddedToCart: true,
+    _updateProduct(
+      product,
+      product.copyWith(
+        quantity: product.quantity + 1,
+        isAddedToCart: true,
+      ),
     );
-    update(['product_$index']);
   }
 
   void increaseQty(ProductModel product) {
-    final index = dummyProducts.indexWhere((item) => item.id == product.id);
-    if (index == -1) return;
-    dummyProducts[index] = dummyProducts[index].copyWith(
-      quantity: product.quantity + 1,
+    _updateProduct(
+      product,
+      product.copyWith(
+        quantity: product.quantity + 1,
+      ),
     );
-    update(['product_$index']);
   }
 
   void decreaseQty(ProductModel product) {
     if (product.quantity == 0) return; // safety guard
-    final index = dummyProducts.indexWhere((item) => item.id == product.id);
-    if (index == -1) return;
     final newQty = product.quantity - 1;
-    dummyProducts[index] = dummyProducts[index].copyWith(
-      quantity: newQty,
-      isAddedToCart: newQty > 0, // false when hits 0, shows "Add to cart" again
+    _updateProduct(
+      product,
+      product.copyWith(
+        quantity: newQty,
+        isAddedToCart: newQty > 0, // false when hits 0, shows "Add to cart" again
+      ),
     );
-    update(['product_$index']);
   }
 }
