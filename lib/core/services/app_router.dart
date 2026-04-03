@@ -5,6 +5,7 @@ import 'package:biggroceryapp/features/authentication/presentation/create_accoun
 import 'package:biggroceryapp/features/authentication/presentation/login_screen.dart';
 import 'package:biggroceryapp/features/home/logic/home_controller.dart';
 import 'package:biggroceryapp/features/home/presentation/home_sceen.dart';
+import 'package:biggroceryapp/features/home/presentation/product_detail_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:get/get.dart';
@@ -87,6 +88,11 @@ class AppRouter {
           _register<HomeController>(() => HomeController());
           return null;
         },
+      ),
+      GoRoute(
+        path: AppRoutes.productDetails,
+        name: AppRoutes.productDetails,
+        builder: (context, state) => const ProductDetailScreen(),
       ),
     ],
   );

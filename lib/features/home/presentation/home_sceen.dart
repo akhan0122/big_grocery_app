@@ -1,7 +1,9 @@
 import 'package:biggroceryapp/core/global_widgets/app_text.dart';
 import 'package:biggroceryapp/core/global_widgets/section_title.dart';
 import 'package:biggroceryapp/core/global_widgets/text_form_field_widget.dart';
+import 'package:biggroceryapp/core/services/app_router.dart';
 import 'package:biggroceryapp/core/utils/app_colors.dart';
+import 'package:biggroceryapp/core/utils/app_routes.dart';
 import 'package:biggroceryapp/core/utils/theme/assets_class/asset_png.dart';
 import 'package:biggroceryapp/features/home/logic/home_controller.dart';
 import 'package:biggroceryapp/features/home/widgets/category_card.dart';
@@ -11,7 +13,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get_state_manager/src/simple/get_state.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:get/get.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -149,27 +150,32 @@ class HomeScreen extends StatelessWidget {
                                     final product =
                                         controller.dummyProducts[index];
 
-                                    return ProductCard(
-                                      name: product.name,
-                                      image: product.imageUrl,
-                                      price: product.price,
-                                      weight: product.weight,
-                                      isNew: product.isNew,
-                                      isFavorite: product.isFavorite,
-                                      isAddedToCart: product.isAddedToCart,
-                                      quantity: product.quantity,
-                                      onAdd: () {
-                                        controller.addToCart(product);
+                                    return InkWell(
+                                      onTap: () {
+                                        AppRouter.push(AppRoutes.productDetails);
                                       },
-                                      onPlus: () {
-                                        controller.increaseQty(product);
-                                      },
-                                      onMinus: () {
-                                        controller.decreaseQty(product);
-                                      },
-                                      onFavoriteTap: () {
-                                        controller.toggleFavorite(product);
-                                      },
+                                      child: ProductCard(
+                                        name: product.name,
+                                        image: product.imageUrl,
+                                        price: product.price,
+                                        weight: product.weight,
+                                        isNew: product.isNew,
+                                        isFavorite: product.isFavorite,
+                                        isAddedToCart: product.isAddedToCart,
+                                        quantity: product.quantity,
+                                        onAdd: () {
+                                          controller.addToCart(product);
+                                        },
+                                        onPlus: () {
+                                          controller.increaseQty(product);
+                                        },
+                                        onMinus: () {
+                                          controller.decreaseQty(product);
+                                        },
+                                        onFavoriteTap: () {
+                                          controller.toggleFavorite(product);
+                                        },
+                                      ),
                                     );
                                   },
                                 );
