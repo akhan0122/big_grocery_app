@@ -13,67 +13,52 @@ class HomeBottomNavigationBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bool isCartActive = activeItem == HomeNavItem.cart;
-
     return SafeArea(
       top: false,
-      child: SizedBox(
-        height: 94.h,
-        child: Stack(
-          clipBehavior: Clip.none,
+      child: Container(
+        height: 78.h,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.08),
+              blurRadius: 18.r,
+              offset: Offset(0, -4.h),
+            ),
+          ],
+        ),
+        child: Row(
           children: [
-            Positioned(
-              left: 0,
-              right: 0,
-              bottom: 0,
-              child: Container(
-                height: 78.h,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.08),
-                      blurRadius: 18.r,
-                      offset: Offset(0, -4.h),
-                    ),
-                  ],
-                ),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: _BottomNavIcon(
-                        icon: Icons.home_outlined,
-                        activeIcon: Icons.home,
-                        isActive: activeItem == HomeNavItem.home,
-                        onTap: () => _go(context, AppRoutes.homeScreen),
-                      ),
-                    ),
-                    Expanded(
-                      child: _BottomNavIcon(
-                        icon: Icons.person_outline,
-                        activeIcon: Icons.person,
-                        isActive: activeItem == HomeNavItem.profile,
-                        onTap: () => _go(context, AppRoutes.profileScreen),
-                      ),
-                    ),
-                    Expanded(
-                      child: _BottomNavIcon(
-                        icon: Icons.favorite_border,
-                        activeIcon: Icons.favorite,
-                        isActive: activeItem == HomeNavItem.favorites,
-                        onTap: () => _go(context, AppRoutes.favoritesScreen),
-                      ),
-                    ),
-                    Expanded(
-                      child: _BottomNavIcon(
-                        icon: Icons.favorite_border,
-                        activeIcon: Icons.favorite,
-                        isActive: activeItem == HomeNavItem.cart,
-                        onTap: () => _go(context, AppRoutes.favoritesScreen),
-                      ),
-                    ),
-                  ],
-                ),
+            Expanded(
+              child: _BottomNavIcon(
+                icon: Icons.home_outlined,
+                activeIcon: Icons.home,
+                isActive: activeItem == HomeNavItem.home,
+                onTap: () => _go(context, HomeNavItem.home),
+              ),
+            ),
+            Expanded(
+              child: _BottomNavIcon(
+                icon: Icons.person_outline,
+                activeIcon: Icons.person,
+                isActive: activeItem == HomeNavItem.profile,
+                onTap: () => _go(context, HomeNavItem.profile),
+              ),
+            ),
+            Expanded(
+              child: _BottomNavIcon(
+                icon: Icons.favorite_border,
+                activeIcon: Icons.favorite,
+                isActive: activeItem == HomeNavItem.favorites,
+                onTap: () => _go(context, HomeNavItem.favorites),
+              ),
+            ),
+            Expanded(
+              child: _BottomNavIcon(
+                icon: Icons.shopping_cart_outlined,
+                activeIcon: Icons.shopping_cart,
+                isActive: activeItem == HomeNavItem.cart,
+                onTap: () => _go(context, HomeNavItem.cart),
               ),
             ),
           ],
@@ -82,8 +67,24 @@ class HomeBottomNavigationBar extends StatelessWidget {
     );
   }
 
-  void _go(BuildContext context, String route) {
-    context.go(route);
+  void _go(BuildContext context, HomeNavItem item) {
+    if (item == activeItem) return;
+    context.go(item.route);
+  }
+}
+
+extension on HomeNavItem {
+  String get route {
+    switch (this) {
+      case HomeNavItem.home:
+        return AppRoutes.homeScreen;
+      case HomeNavItem.profile:
+        return AppRoutes.profileScreen;
+      case HomeNavItem.favorites:
+        return AppRoutes.favoritesScreen;
+      case HomeNavItem.cart:
+        return AppRoutes.cartScreen;
+    }
   }
 }
 

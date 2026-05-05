@@ -72,28 +72,6 @@ class HomeScreen extends StatelessWidget {
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
-                                // Positioned(
-                                //   bottom: 12.h,
-                                //   left: 0,
-                                //   right: 0,
-                                //   child: Center(
-                                //     child: DotsIndicator(
-                                //       dotsCount: 4,
-                                //       position: 1,
-                                //       decorator: DotsDecorator(
-                                //         activeColor: AppColors.primaryDark,
-                                //         color: AppColors.primary,
-                                //         size: Size.square(6.r),
-                                //         activeSize: Size(16.w, 8.h),
-                                //         activeShape: RoundedRectangleBorder(
-                                //           borderRadius: BorderRadius.circular(
-                                //             5.r,
-                                //           ),
-                                //         ),
-                                //       ),
-                                //     ),
-                                //   ),
-                                // ),
                               ],
                             ),
                           ),

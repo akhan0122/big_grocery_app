@@ -4,10 +4,11 @@ import 'package:biggroceryapp/core/utils/app_routes.dart';
 import 'package:biggroceryapp/features/authentication/presentation/create_account.dart';
 import 'package:biggroceryapp/features/authentication/presentation/login_screen.dart';
 import 'package:biggroceryapp/features/home/logic/home_controller.dart';
-import 'package:biggroceryapp/features/home/presentation/dummy_nav_screen.dart';
+import 'package:biggroceryapp/features/home/presentation/cart_screen.dart';
+import 'package:biggroceryapp/features/home/presentation/favorites_screen.dart';
 import 'package:biggroceryapp/features/home/presentation/home_sceen.dart';
+import 'package:biggroceryapp/features/home/presentation/profile_screen.dart';
 import 'package:biggroceryapp/features/home/presentation/product_detail_screen.dart';
-import 'package:biggroceryapp/features/home/widgets/home_bottom_navigation_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:get/get.dart';
@@ -94,30 +95,19 @@ class AppRouter {
       GoRoute(
         path: AppRoutes.profileScreen,
         name: AppRoutes.profileScreen,
-        builder: (context, state) => const DummyNavScreen(
-          title: 'Profile',
-          icon: Icons.person_outline,
-          activeItem: HomeNavItem.profile,
-        ),
+        builder: (context, state) => const ProfileScreen(),
       ),
       GoRoute(
         path: AppRoutes.favoritesScreen,
         name: AppRoutes.favoritesScreen,
-        builder: (context, state) => const DummyNavScreen(
-          title: 'Favorites',
-          icon: Icons.favorite_border,
-          activeItem: HomeNavItem.favorites,
-        ),
+        builder: (context, state) => const FavoritesScreen(),
       ),
       GoRoute(
         path: AppRoutes.cartScreen,
         name: AppRoutes.cartScreen,
-        builder: (context, state) => const DummyNavScreen(
-          title: 'Cart',
-          icon: Icons.shopping_bag_outlined,
-          activeItem: HomeNavItem.cart,
-        ),
+        builder: (context, state) => const CartScreen(),
       ),
+
       GoRoute(
         path: AppRoutes.productDetails,
         name: AppRoutes.productDetails,
@@ -139,7 +129,8 @@ class AppRouter {
     }
   }
 
-  static void go(String route, {Object? extra}) => router.go(route, extra: extra);
+  static void go(String route, {Object? extra}) =>
+      router.go(route, extra: extra);
   static Future<T?> push<T>(String route, {Object? extra}) =>
       router.push<T>(route, extra: extra);
   static void pop(BuildContext context) => GoRouter.of(context).pop();
