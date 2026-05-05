@@ -106,7 +106,8 @@ class ProductDetailScreen extends StatelessWidget {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   AppText(
-                                    text: '\$${product.price.toStringAsFixed(2)}',
+                                    text:
+                                        '\$${product.price.toStringAsFixed(2)}',
                                     color: const Color(0xFF34C759),
                                     fontSize: 22.sp,
                                     fontWeight: FontWeight.w700,
@@ -212,7 +213,9 @@ class ProductDetailScreen extends StatelessWidget {
                               Expanded(
                                 flex: 3,
                                 child: Padding(
-                                  padding: EdgeInsets.symmetric(horizontal: 16.w),
+                                  padding: EdgeInsets.symmetric(
+                                    horizontal: 16.w,
+                                  ),
                                   child: AppText(
                                     text: 'Quantity',
                                     color: const Color(0xFF8E8E93),

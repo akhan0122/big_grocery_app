@@ -4,8 +4,10 @@ import 'package:biggroceryapp/core/utils/app_routes.dart';
 import 'package:biggroceryapp/features/authentication/presentation/create_account.dart';
 import 'package:biggroceryapp/features/authentication/presentation/login_screen.dart';
 import 'package:biggroceryapp/features/home/logic/home_controller.dart';
+import 'package:biggroceryapp/features/home/presentation/dummy_nav_screen.dart';
 import 'package:biggroceryapp/features/home/presentation/home_sceen.dart';
 import 'package:biggroceryapp/features/home/presentation/product_detail_screen.dart';
+import 'package:biggroceryapp/features/home/widgets/home_bottom_navigation_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:get/get.dart';
@@ -88,6 +90,33 @@ class AppRouter {
           _register<HomeController>(() => HomeController());
           return null;
         },
+      ),
+      GoRoute(
+        path: AppRoutes.profileScreen,
+        name: AppRoutes.profileScreen,
+        builder: (context, state) => const DummyNavScreen(
+          title: 'Profile',
+          icon: Icons.person_outline,
+          activeItem: HomeNavItem.profile,
+        ),
+      ),
+      GoRoute(
+        path: AppRoutes.favoritesScreen,
+        name: AppRoutes.favoritesScreen,
+        builder: (context, state) => const DummyNavScreen(
+          title: 'Favorites',
+          icon: Icons.favorite_border,
+          activeItem: HomeNavItem.favorites,
+        ),
+      ),
+      GoRoute(
+        path: AppRoutes.cartScreen,
+        name: AppRoutes.cartScreen,
+        builder: (context, state) => const DummyNavScreen(
+          title: 'Cart',
+          icon: Icons.shopping_bag_outlined,
+          activeItem: HomeNavItem.cart,
+        ),
       ),
       GoRoute(
         path: AppRoutes.productDetails,

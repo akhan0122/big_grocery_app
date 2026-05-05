@@ -152,6 +152,7 @@ class HomeController extends GetxController {
       product,
       product.copyWith(
         quantity: product.quantity + 1,
+        isAddedToCart: true,
       ),
     );
   }

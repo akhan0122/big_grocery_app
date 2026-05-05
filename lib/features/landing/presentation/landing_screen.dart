@@ -30,16 +30,42 @@ class LandingScreen extends GetView<LandingController> {
             Expanded(
               child: SizedBox(
                 width: double.infinity,
-                child: ClipPath(
-                  clipper: InwardBottomClipper(),
-                  child: PageView.builder(
-                    controller: controller.pageController,
-                    itemCount: controller.imagesList.length,
-                    itemBuilder: (_, index) => Image.asset(
-                      controller.imagesList[index],
-                      fit: BoxFit.cover,
+                child: Stack(
+                  children: [
+                    ClipPath(
+                      clipper: InwardBottomClipper(),
+                      child: PageView.builder(
+                        controller: controller.pageController,
+                        itemCount: controller.imagesList.length,
+                        itemBuilder: (_, index) => Image.asset(
+                          controller.imagesList[index],
+                          fit: BoxFit.cover,
+                        ),
+                      ),
                     ),
-                  ),
+                    Positioned(
+                      top: 0,
+                      right: 0,
+                      child: SafeArea(
+                        child: TextButton(
+                          onPressed: controller.skipToLogin,
+                          style: TextButton.styleFrom(
+                            foregroundColor: AppColors.primaryDark,
+                            padding: EdgeInsets.symmetric(
+                              horizontal: 18.w,
+                              vertical: 8.h,
+                            ),
+                          ),
+                          child: AppText(
+                            text: TextValues.skip,
+                            color: AppColors.primaryDark,
+                            fontSize: 16.sp,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),
