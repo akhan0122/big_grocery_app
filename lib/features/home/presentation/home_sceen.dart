@@ -7,7 +7,6 @@ import 'package:biggroceryapp/core/utils/app_routes.dart';
 import 'package:biggroceryapp/core/utils/theme/assets_class/asset_png.dart';
 import 'package:biggroceryapp/features/home/logic/home_controller.dart';
 import 'package:biggroceryapp/features/home/widgets/category_card.dart';
-import 'package:dots_indicator/dots_indicator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
