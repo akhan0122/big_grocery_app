@@ -229,12 +229,23 @@ class ProductDetailScreen extends StatelessWidget {
                               Expanded(
                                 child: InkWell(
                                   onTap: () => controller.decreaseQty(product),
+                                  borderRadius: BorderRadius.circular(18.r),
                                   child: Center(
-                                    child: AppText(
-                                      text: '-',
-                                      color: const Color(0xFF7AC943),
-                                      fontSize: 28.sp,
-                                      fontWeight: FontWeight.w400,
+                                    child: Container(
+                                      width: 28.w,
+                                      height: 28.h,
+                                      decoration: const BoxDecoration(
+                                        color: Color(0xFFE7F4D8),
+                                        shape: BoxShape.circle,
+                                      ),
+                                      child: Center(
+                                        child: AppText(
+                                          text: '-',
+                                          color: const Color(0xFF7AC943),
+                                          fontSize: 20.sp,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
                                     ),
                                   ),
                                 ),
@@ -262,12 +273,23 @@ class ProductDetailScreen extends StatelessWidget {
                               Expanded(
                                 child: InkWell(
                                   onTap: () => controller.increaseQty(product),
+                                  borderRadius: BorderRadius.circular(18.r),
                                   child: Center(
-                                    child: AppText(
-                                      text: '+',
-                                      color: const Color(0xFF7AC943),
-                                      fontSize: 28.sp,
-                                      fontWeight: FontWeight.w400,
+                                    child: Container(
+                                      width: 28.w,
+                                      height: 28.h,
+                                      decoration: const BoxDecoration(
+                                        color: Color(0xFFE7F4D8),
+                                        shape: BoxShape.circle,
+                                      ),
+                                      child: Center(
+                                        child: AppText(
+                                          text: '+',
+                                          color: const Color(0xFF7AC943),
+                                          fontSize: 20.sp,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
                                     ),
                                   ),
                                 ),

@@ -1,6 +1,8 @@
 import 'package:biggroceryapp/core/global_widgets/app_elevated_button.dart';
 import 'package:biggroceryapp/core/global_widgets/app_text.dart';
+import 'package:biggroceryapp/core/services/app_router.dart';
 import 'package:biggroceryapp/core/utils/app_colors.dart';
+import 'package:biggroceryapp/core/utils/app_routes.dart';
 import 'package:biggroceryapp/core/utils/text_values.dart';
 import 'package:biggroceryapp/features/landing/logic/landing_controller.dart';
 import 'package:biggroceryapp/features/landing/widgets/custom_curve_clipper.dart';
@@ -28,19 +30,42 @@ class LandingScreen extends GetView<LandingController> {
           children: [
             // ✅ Top image goes behind status bar
             Expanded(
-              child: SizedBox(
-                width: double.infinity,
-                child: ClipPath(
-                  clipper: InwardBottomClipper(),
-                  child: PageView.builder(
-                    controller: controller.pageController,
-                    itemCount: controller.imagesList.length,
-                    itemBuilder: (_, index) => Image.asset(
-                      controller.imagesList[index],
-                      fit: BoxFit.cover,
+              child: Stack(
+                children: [
+                  SizedBox(
+                    width: double.infinity,
+                    child: ClipPath(
+                      clipper: InwardBottomClipper(),
+                      child: PageView.builder(
+                        controller: controller.pageController,
+                        itemCount: controller.imagesList.length,
+                        itemBuilder: (_, index) => Image.asset(
+                          controller.imagesList[index],
+                          fit: BoxFit.cover,
+                        ),
+                      ),
                     ),
                   ),
-                ),
+                  SafeArea(
+                    child: Align(
+                      alignment: Alignment.topRight,
+                      child: Padding(
+                        padding: EdgeInsets.only(top: 8.h, right: 14.w),
+                        child: TextButton(
+                          onPressed: () => AppRouter.go(AppRoutes.loginScreen),
+                          style: TextButton.styleFrom(
+                            foregroundColor: Colors.black87,
+                            textStyle: TextStyle(
+                              fontSize: 16.sp,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          child: const Text('Skip'),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
 

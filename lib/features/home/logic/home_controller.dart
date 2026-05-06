@@ -1,10 +1,19 @@
+import 'package:biggroceryapp/core/network/api_exception.dart';
 import 'package:biggroceryapp/core/utils/theme/assets_class/asset_svg.dart';
+import 'package:biggroceryapp/features/home/data/home_repository.dart';
+import 'package:biggroceryapp/features/home/model/api_product_model.dart';
 import 'package:biggroceryapp/features/home/model/category_model.dart';
 import 'package:biggroceryapp/features/home/model/home_model.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class HomeController extends GetxController {
+  final HomeRepository _homeRepository = HomeRepository();
+
+  bool isLoadingProducts = false;
+  String? productsError;
+  List<ApiProductModel> apiProducts = [];
+
   List<CategoryModel> categories = [
     CategoryModel(
       id: 1,
@@ -114,6 +123,29 @@ class HomeController extends GetxController {
     ),
   ];
 
+  @override
+  void onInit() {
+    super.onInit();
+    getProductsFromApi();
+  }
+
+  Future<void> getProductsFromApi() async {
+    isLoadingProducts = true;
+    productsError = null;
+    update(['api_products']);
+
+    try {
+      apiProducts = await _homeRepository.getProducts();
+    } on ApiException catch (error) {
+      productsError = error.message;
+    } catch (_) {
+      productsError = 'Unable to fetch products.';
+    } finally {
+      isLoadingProducts = false;
+      update(['api_products']);
+    }
+  }
+
   ProductModel? findProductById(int id) {
     for (final product in dummyProducts) {
       if (product.id == id) return product;
@@ -129,42 +161,26 @@ class HomeController extends GetxController {
   }
 
   void toggleFavorite(ProductModel product) {
-    _updateProduct(
-      product,
-      product.copyWith(
-        isFavorite: !product.isFavorite,
-      ),
-    );
+    _updateProduct(product, product.copyWith(isFavorite: !product.isFavorite));
   }
 
   void addToCart(ProductModel product) {
     _updateProduct(
       product,
-      product.copyWith(
-        quantity: product.quantity + 1,
-        isAddedToCart: true,
-      ),
+      product.copyWith(quantity: product.quantity + 1, isAddedToCart: true),
     );
   }
 
   void increaseQty(ProductModel product) {
-    _updateProduct(
-      product,
-      product.copyWith(
-        quantity: product.quantity + 1,
-      ),
-    );
+    _updateProduct(product, product.copyWith(quantity: product.quantity + 1));
   }
 
   void decreaseQty(ProductModel product) {
-    if (product.quantity == 0) return; // safety guard
+    if (product.quantity == 0) return;
     final newQty = product.quantity - 1;
     _updateProduct(
       product,
-      product.copyWith(
-        quantity: newQty,
-        isAddedToCart: newQty > 0, // false when hits 0, shows "Add to cart" again
-      ),
+      product.copyWith(quantity: newQty, isAddedToCart: newQty > 0),
     );
   }
 }
