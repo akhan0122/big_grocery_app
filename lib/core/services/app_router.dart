@@ -4,7 +4,9 @@ import 'package:biggroceryapp/core/utils/app_routes.dart';
 import 'package:biggroceryapp/features/authentication/presentation/create_account.dart';
 import 'package:biggroceryapp/features/authentication/presentation/login_screen.dart';
 import 'package:biggroceryapp/features/home/logic/home_controller.dart';
+import 'package:biggroceryapp/features/home/model/api_product_model.dart';
 import 'package:biggroceryapp/features/home/presentation/home_sceen.dart';
+import 'package:biggroceryapp/features/home/presentation/product_detail_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:get/get.dart';
@@ -92,8 +94,10 @@ class AppRouter {
         path: AppRoutes.productDetails,
         name: AppRoutes.productDetails,
         builder: (context, state) {
-          int.tryParse(state.pathParameters['id'] ?? '');
-          return Text('fg');
+          final product = state.extra;
+          return ProductDetailScreen(
+            product: product is ProductModel ? product : null,
+          );
         },
         redirect: (context, state) {
           _register<HomeController>(() => HomeController());

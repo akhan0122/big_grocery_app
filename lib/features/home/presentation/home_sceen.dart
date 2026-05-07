@@ -1,7 +1,9 @@
 import 'package:biggroceryapp/core/global_widgets/app_text.dart';
 import 'package:biggroceryapp/core/global_widgets/section_title.dart';
 import 'package:biggroceryapp/core/global_widgets/text_form_field_widget.dart';
+import 'package:biggroceryapp/core/services/app_router.dart';
 import 'package:biggroceryapp/core/utils/app_colors.dart';
+import 'package:biggroceryapp/core/utils/app_routes.dart';
 import 'package:biggroceryapp/core/utils/theme/assets_class/asset_png.dart';
 import 'package:biggroceryapp/features/home/logic/home_controller.dart';
 import 'package:biggroceryapp/features/home/widgets/category_card.dart';
@@ -83,9 +85,10 @@ class _HomeTabContent extends StatelessWidget {
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
               child: TextFormFieldWidget(
-                controller: TextEditingController(),
+                controller: controller.searchController,
                 hintText: 'Search products...',
                 prefixIcon: Icons.search,
+                onChanged: controller.updateSearchQuery,
               ),
             ),
             Expanded(
@@ -176,7 +179,8 @@ class _HomeTabContent extends StatelessWidget {
                           );
                         }
 
-                        if (controller.apiProducts.isEmpty) {
+                        final products = controller.filteredProducts;
+                        if (products.isEmpty) {
                           return const _ProductsMessage(
                             message: 'No products found.',
                           );
@@ -194,9 +198,9 @@ class _HomeTabContent extends StatelessWidget {
                                   mainAxisSpacing: 12.h,
                                   childAspectRatio: 0.66,
                                 ),
-                            itemCount: controller.apiProducts.length,
+                            itemCount: products.length,
                             itemBuilder: (context, index) {
-                              final product = controller.apiProducts[index];
+                              final product = products[index];
 
                               return ProductCard(
                                 name: product.title ?? '',
@@ -211,7 +215,14 @@ class _HomeTabContent extends StatelessWidget {
                                 onPlus: () {},
                                 onMinus: () {},
                                 onFavoriteTap: () {},
-                                onCardTap: () {},
+                                onCardTap: () {
+                                  AppRouter.push(
+                                    AppRoutes.productDetailsById(
+                                      product.id ?? 0,
+                                    ),
+                                    extra: product,
+                                  );
+                                },
                               );
                             },
                           ),

@@ -11,7 +11,23 @@ class HomeController extends GetxController {
 
   bool isLoadingProducts = false;
   String? productsError;
+  String searchQuery = '';
   List<ProductModel> apiProducts = [];
+  final TextEditingController searchController = TextEditingController();
+
+  List<ProductModel> get filteredProducts {
+    final query = searchQuery.trim().toLowerCase();
+    if (query.isEmpty) return apiProducts;
+
+    return apiProducts.where((product) {
+      final title = product.title?.toLowerCase() ?? '';
+      final category = product.category?.name?.toLowerCase() ?? '';
+      final description = product.description?.toLowerCase() ?? '';
+      return title.contains(query) ||
+          category.contains(query) ||
+          description.contains(query);
+    }).toList();
+  }
 
   List<CategoryModel> categories = [
     CategoryModel(
@@ -73,6 +89,17 @@ class HomeController extends GetxController {
       isLoadingProducts = false;
       update(['api_products']);
     }
+  }
+
+  void updateSearchQuery(String value) {
+    searchQuery = value;
+    update(['api_products']);
+  }
+
+  @override
+  void onClose() {
+    searchController.dispose();
+    super.onClose();
   }
 
   // void _updateProduct(ProductModel product, ProductModel updatedProduct) {
