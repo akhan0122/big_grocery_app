@@ -5,7 +5,9 @@ import 'package:biggroceryapp/features/authentication/presentation/create_accoun
 import 'package:biggroceryapp/features/authentication/presentation/login_screen.dart';
 import 'package:biggroceryapp/features/home/logic/home_controller.dart';
 import 'package:biggroceryapp/features/home/model/api_product_model.dart';
+import 'package:biggroceryapp/features/home/presentation/categories_screen.dart';
 import 'package:biggroceryapp/features/home/presentation/home_sceen.dart';
+import 'package:biggroceryapp/features/home/presentation/payment_method_screen.dart';
 import 'package:biggroceryapp/features/home/presentation/product_detail_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -85,6 +87,24 @@ class AppRouter {
         path: AppRoutes.homeScreen,
         name: AppRoutes.homeScreen,
         builder: (context, state) => const HomeScreen(),
+        redirect: (context, state) {
+          _register<HomeController>(() => HomeController());
+          return null;
+        },
+      ),
+      GoRoute(
+        path: AppRoutes.categories,
+        name: AppRoutes.categories,
+        builder: (context, state) => const CategoriesScreen(),
+        redirect: (context, state) {
+          _register<HomeController>(() => HomeController());
+          return null;
+        },
+      ),
+      GoRoute(
+        path: AppRoutes.paymentMethod,
+        name: AppRoutes.paymentMethod,
+        builder: (context, state) => const PaymentMethodScreen(),
         redirect: (context, state) {
           _register<HomeController>(() => HomeController());
           return null;

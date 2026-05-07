@@ -87,10 +87,41 @@ int? _asInt(Object? value) {
 
 List<String> _asStringList(Object? value) {
   if (value is List) {
-    return value.map((item) => item.toString()).toList();
+    return value
+        .map((item) => _cleanImageUrl(item.toString()))
+        .where((item) => item.isNotEmpty)
+        .toList();
   }
   if (value is String && value.isNotEmpty) {
-    return [value];
+    final image = _cleanImageUrl(value);
+    return image.isEmpty ? [] : [image];
   }
   return [];
+}
+
+String _cleanImageUrl(String value) {
+  var image = value.trim();
+  image = image.replaceAll('\\', '');
+  image = image.replaceAll('[', '');
+  image = image.replaceAll(']', '');
+  image = image.replaceAll('"', '');
+  image = image.replaceAll("'", '');
+  image = image.trim();
+
+  if (!image.startsWith('http://') && !image.startsWith('https://')) {
+    return '';
+  }
+
+  final uri = Uri.tryParse(image);
+  if (uri == null || !uri.hasAuthority) return '';
+
+  if (uri.host == 'placehold.co' &&
+      !uri.path.endsWith('.png') &&
+      !uri.path.endsWith('.jpg') &&
+      !uri.path.endsWith('.jpeg') &&
+      !uri.path.endsWith('.webp')) {
+    return uri.replace(path: '${uri.path}.png').toString();
+  }
+
+  return image;
 }

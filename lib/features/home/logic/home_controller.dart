@@ -9,6 +9,7 @@ import 'package:get/get.dart';
 class HomeController extends GetxController {
   final HomeRepository _homeRepository = HomeRepository();
   static const int allCategoryId = 0;
+  Future<void>? _initialLoadFuture;
 
   bool isLoadingProducts = false;
   bool isLoadingCategories = false;
@@ -17,6 +18,8 @@ class HomeController extends GetxController {
   String searchQuery = '';
   int selectedCategoryId = allCategoryId;
   List<ProductModel> apiProducts = [];
+  final Set<int> favoriteProductIds = {};
+  final Map<int, int> cartQuantities = {};
   final TextEditingController searchController = TextEditingController();
 
   List<ProductModel> get filteredProducts {
@@ -70,6 +73,28 @@ class HomeController extends GetxController {
 
   List<CategoryModel> get categoriesWithAll => [allCategory, ...categories];
 
+  List<ProductModel> get favoriteProducts {
+    return apiProducts.where((product) {
+      final id = product.id;
+      return id != null && favoriteProductIds.contains(id);
+    }).toList();
+  }
+
+  List<ProductModel> get cartProducts {
+    return apiProducts.where((product) {
+      final id = product.id;
+      return id != null && cartQuantities.containsKey(id);
+    }).toList();
+  }
+
+  double get cartTotal {
+    return cartProducts.fold(0, (total, product) {
+      final id = product.id;
+      final quantity = id == null ? 0 : cartQuantities[id] ?? 0;
+      return total + ((product.price ?? 0) * quantity);
+    });
+  }
+
   List<CategoryModel> fallbackCategories = [
     CategoryModel(
       id: 1,
@@ -112,8 +137,30 @@ class HomeController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    getCategoriesFromApi();
-    getProductsFromApi();
+    loadInitialData();
+  }
+
+  Future<void> loadInitialData({bool force = false}) {
+    if (!force &&
+        apiProducts.isNotEmpty &&
+        categories.isNotEmpty &&
+        productsError == null &&
+        categoriesError == null) {
+      return Future.value();
+    }
+
+    final currentLoad = _initialLoadFuture;
+    if (!force && currentLoad != null) return currentLoad;
+
+    _initialLoadFuture =
+        Future.wait([
+          getCategoriesFromApi(),
+          getProductsFromApi(),
+        ]).whenComplete(() {
+          _initialLoadFuture = null;
+        });
+
+    return _initialLoadFuture!;
   }
 
   Future<void> getCategoriesFromApi() async {
@@ -168,40 +215,86 @@ class HomeController extends GetxController {
     update(['categories', 'api_products']);
   }
 
+  bool isFavorite(ProductModel product) {
+    final id = product.id;
+    return id != null && favoriteProductIds.contains(id);
+  }
+
+  bool isAddedToCart(ProductModel product) {
+    final id = product.id;
+    return id != null && cartQuantities.containsKey(id);
+  }
+
+  int quantityFor(ProductModel product) {
+    final id = product.id;
+    if (id == null) return 0;
+    return cartQuantities[id] ?? 0;
+  }
+
+  void toggleFavorite(ProductModel product) {
+    final id = product.id;
+    if (id == null) return;
+
+    if (favoriteProductIds.contains(id)) {
+      favoriteProductIds.remove(id);
+    } else {
+      favoriteProductIds.add(id);
+    }
+
+    _updateProductState(product);
+  }
+
+  void addToCart(ProductModel product) {
+    final id = product.id;
+    if (id == null) return;
+
+    cartQuantities[id] = cartQuantities[id] ?? 1;
+    _updateProductState(product);
+  }
+
+  void increaseQty(ProductModel product) {
+    final id = product.id;
+    if (id == null) return;
+
+    cartQuantities[id] = (cartQuantities[id] ?? 0) + 1;
+    _updateProductState(product);
+  }
+
+  void decreaseQty(ProductModel product) {
+    final id = product.id;
+    if (id == null) return;
+
+    final currentQty = cartQuantities[id] ?? 0;
+    if (currentQty <= 1) {
+      cartQuantities.remove(id);
+    } else {
+      cartQuantities[id] = currentQty - 1;
+    }
+
+    _updateProductState(product);
+  }
+
+  void removeFromCart(ProductModel product) {
+    final id = product.id;
+    if (id == null) return;
+
+    cartQuantities.remove(id);
+    _updateProductState(product);
+  }
+
+  void _updateProductState(ProductModel product) {
+    final id = product.id;
+    update([
+      'api_products',
+      'favorites',
+      'cart',
+      if (id != null) 'product_detail_$id',
+    ]);
+  }
+
   @override
   void onClose() {
     searchController.dispose();
     super.onClose();
   }
-
-  // void _updateProduct(ProductModel product, ProductModel updatedProduct) {
-  //   final index = dummyProducts.indexWhere((item) => item.id == product.id);
-  //   if (index == -1) return;
-  //   dummyProducts[index] = updatedProduct;
-  //   update(['product_$index', 'product_detail_${product.id}']);
-  // }
-
-  // void toggleFavorite(ProductModel product) {
-  //   _updateProduct(product, product.copyWith(isFavorite: !product.isFavorite));
-  // }
-
-  // void addToCart(ProductModel product) {
-  //   _updateProduct(
-  //     product,
-  //     product.copyWith(quantity: product.quantity + 1, isAddedToCart: true),
-  //   );
-  // }
-
-  // void increaseQty(ProductModel product) {
-  //   _updateProduct(product, product.copyWith(quantity: product.quantity + 1));
-  // }
-
-  // void decreaseQty(ProductModel product) {
-  //   if (product.quantity == 0) return;
-  //   final newQty = product.quantity - 1;
-  //   _updateProduct(
-  //     product,
-  //     product.copyWith(quantity: newQty, isAddedToCart: newQty > 0),
-  //   );
-  // }
 }

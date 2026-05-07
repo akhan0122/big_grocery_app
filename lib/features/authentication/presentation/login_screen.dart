@@ -7,8 +7,10 @@ import 'package:biggroceryapp/core/services/app_router.dart';
 import 'package:biggroceryapp/core/utils/app_colors.dart';
 import 'package:biggroceryapp/core/utils/app_routes.dart';
 import 'package:biggroceryapp/core/utils/theme/assets_class/asset_png.dart';
+import 'package:biggroceryapp/features/authentication/logic/authentication_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get/get_state_manager/src/simple/get_state.dart';
 
 class LoginScreen extends StatelessWidget {
   const LoginScreen({super.key});
@@ -17,7 +19,7 @@ class LoginScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       extendBodyBehindAppBar: true,
-      appBar: AppBarWidget(
+      appBar: const AppBarWidget(
         backgroundColor: Colors.transparent,
         title: 'Login',
         showBackButton: true,
@@ -28,28 +30,25 @@ class LoginScreen extends StatelessWidget {
       body: SingleChildScrollView(
         child: Stack(
           children: [
-            // ── Layer 1: Hero Image (full width) ────────────
             SizedBox(
               height: 470.h,
               width: double.infinity,
               child: Image.asset(AssetPng.loginCover, fit: BoxFit.cover),
             ),
-
             Container(
               margin: EdgeInsets.only(top: 430.h),
               width: double.infinity,
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(30.r), // ← rounded corners
-                  topRight: Radius.circular(30.r), // matching Figma
+                  topLeft: Radius.circular(30.r),
+                  topRight: Radius.circular(30.r),
                 ),
               ),
               padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 28.h),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // ── Welcome text ──────────────────────────
                   AppText(
                     text: 'Welcome back!',
                     style: TextStyle(
@@ -67,33 +66,49 @@ class LoginScreen extends StatelessWidget {
                     ),
                   ),
                   SizedBox(height: 24.h),
-
-                  // ── Email field ───────────────────────────
-                  TextFormFieldWidget(
-                    controller: TextEditingController(),
-                    hintText: 'Email Address',
-                    prefixIcon: Icons.email_outlined,
-                    keyboardType: TextInputType.emailAddress,
-                  ),
-                  SizedBox(height: 14.h),
-
-                  // ── Password field ────────────────────────
-                  TextFormFieldWidget(
-                    controller: TextEditingController(),
-                    hintText: 'Password',
-                    prefixIcon: Icons.lock_outline,
-                    isPassword: true,
+                  GetBuilder<AuthenticationController>(
+                    id: 'login',
+                    builder: (controller) {
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          TextFormFieldWidget(
+                            controller: controller.emailController,
+                            hintText: 'Email Address',
+                            prefixIcon: Icons.email_outlined,
+                            keyboardType: TextInputType.emailAddress,
+                            enabled: !controller.isLoggingIn,
+                          ),
+                          SizedBox(height: 14.h),
+                          TextFormFieldWidget(
+                            controller: controller.passwordController,
+                            hintText: 'Password',
+                            prefixIcon: Icons.lock_outline,
+                            isPassword: true,
+                            enabled: !controller.isLoggingIn,
+                          ),
+                          if (controller.loginError != null) ...[
+                            SizedBox(height: 10.h),
+                            Text(
+                              controller.loginError!,
+                              style: TextStyle(
+                                color: Colors.red.shade700,
+                                fontSize: 13.sp,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ],
+                        ],
+                      );
+                    },
                   ),
                   SizedBox(height: 16.h),
-
-                  // ── Remember me + Forgot password ─────────
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Row(
                         children: [
                           AppToggleWidget(value: false, onChanged: (val) {}),
-
                           SizedBox(width: 6.w),
                           AppText(
                             text: 'Remember me',
@@ -115,22 +130,48 @@ class LoginScreen extends StatelessWidget {
                     ],
                   ),
                   SizedBox(height: 24.h),
-
-                  // ── Login button ──────────────────────────
-                  AppElevatedButton(
-                    title: "Sign In",
-                    onPressed: () {
-                      AppRouter.push(AppRoutes.homeScreen);
+                  GetBuilder<AuthenticationController>(
+                    id: 'login',
+                    builder: (controller) {
+                      return AppElevatedButton(
+                        onPressed: controller.isLoggingIn
+                            ? null
+                            : controller.login,
+                        child: controller.isLoggingIn
+                            ? Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  SizedBox(
+                                    width: 18.r,
+                                    height: 18.r,
+                                    child: const CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                  SizedBox(width: 10.w),
+                                  Text(
+                                    'Loading home...',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 18.sp,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ],
+                              )
+                            : Text(
+                                'Sign In',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 18.sp,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                      );
                     },
-                    titleStyle: TextStyle(
-                      color: Colors.white,
-                      fontSize: 18.sp,
-                      fontWeight: FontWeight.bold,
-                    ),
                   ),
                   SizedBox(height: 20.h),
-
-                  // ── Sign up link ──────────────────────────
                   Center(
                     child: GestureDetector(
                       onTap: () {

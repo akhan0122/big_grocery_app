@@ -1,38 +1,31 @@
-// lib/core/routes/app_router_observer.dart
-
+import 'package:biggroceryapp/core/utils/app_routes.dart';
+import 'package:biggroceryapp/features/authentication/logic/authentication_controller.dart';
 import 'package:biggroceryapp/features/home/logic/home_controller.dart';
+import 'package:biggroceryapp/features/landing/logic/landing_controller.dart';
+import 'package:biggroceryapp/features/splash/logic/splash_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:biggroceryapp/features/splash/logic/splash_controller.dart';
-import 'package:biggroceryapp/features/landing/logic/landing_controller.dart';
-import 'package:biggroceryapp/features/authentication/logic/authentication_controller.dart';
 
 class AppRouterObserver extends NavigatorObserver {
-  // WHY didPop: fires when user goes BACK (pops a screen)
   @override
   void didPop(Route route, Route? previousRoute) {
     super.didPop(route, previousRoute);
-    _deleteController(route.settings.name);
+    _deleteController(route.settings.name, previousRoute?.settings.name);
   }
 
-  // WHY didReplace: fires when screen REPLACES another
-  // example: splash.go(home) — splash is replaced, not popped
   @override
   void didReplace({Route? newRoute, Route? oldRoute}) {
     super.didReplace(newRoute: newRoute, oldRoute: oldRoute);
-    _deleteController(oldRoute?.settings.name);
+    _deleteController(oldRoute?.settings.name, newRoute?.settings.name);
   }
 
-  // WHY didRemove: fires when screen removed from stack
-  // example: Get.offAll() removes everything
   @override
   void didRemove(Route route, Route? previousRoute) {
     super.didRemove(route, previousRoute);
-    _deleteController(route.settings.name);
+    _deleteController(route.settings.name, previousRoute?.settings.name);
   }
 
-  // single cleanup method — all disposal logic lives here
-  void _deleteController(String? routeName) {
+  void _deleteController(String? routeName, String? nextRouteName) {
     if (routeName == null) return;
 
     switch (routeName) {
@@ -40,6 +33,7 @@ class AppRouterObserver extends NavigatorObserver {
         _delete<SplashController>();
         break;
       case 'home':
+      case AppRoutes.homeScreen:
         _delete<HomeController>();
         break;
       case 'landing':
@@ -47,22 +41,27 @@ class AppRouterObserver extends NavigatorObserver {
         break;
       case 'authentication':
       case 'login':
-      case 'register':
-        // WHY: only delete auth controller when leaving
-        // the ENTIRE auth flow, not between auth screens
-        final goingToAuth =
-            Get.currentRoute == '/authentication' ||
-            Get.currentRoute == '/login' ||
-            Get.currentRoute == '/register';
-
-        if (!goingToAuth) {
-          _delete<AuthenticationController>();
+      case 'signup':
+        if (!_isAuthRoute(nextRouteName)) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (!_isAuthRoute(Get.currentRoute)) {
+              _delete<AuthenticationController>();
+            }
+          });
         }
         break;
     }
   }
 
-  // safe delete — won't crash if controller already gone
+  bool _isAuthRoute(String? routeNameOrPath) {
+    return routeNameOrPath == 'authentication' ||
+        routeNameOrPath == 'login' ||
+        routeNameOrPath == 'signup' ||
+        routeNameOrPath == AppRoutes.authentication ||
+        routeNameOrPath == AppRoutes.loginScreen ||
+        routeNameOrPath == AppRoutes.signUpScreen;
+  }
+
   void _delete<T>() {
     if (Get.isRegistered<T>()) {
       Get.delete<T>(force: true);

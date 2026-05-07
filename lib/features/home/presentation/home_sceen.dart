@@ -6,6 +6,7 @@ import 'package:biggroceryapp/core/utils/app_colors.dart';
 import 'package:biggroceryapp/core/utils/app_routes.dart';
 import 'package:biggroceryapp/core/utils/theme/assets_class/asset_png.dart';
 import 'package:biggroceryapp/features/home/logic/home_controller.dart';
+import 'package:biggroceryapp/features/home/model/api_product_model.dart';
 import 'package:biggroceryapp/features/home/widgets/category_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -36,8 +37,8 @@ class _HomeScreenState extends State<HomeScreen> {
             index: _currentIndex,
             children: const [
               _HomeTabContent(),
-              _SimpleTabContent(title: 'Favorite'),
-              _SimpleTabContent(title: 'Cart'),
+              _FavoritesTabContent(),
+              _CartTabContent(),
               _SimpleTabContent(title: 'Setting'),
             ],
           ),
@@ -130,7 +131,7 @@ class _HomeTabContent extends StatelessWidget {
                       child: SectionHeaderWidget(
                         title: 'Categories',
                         onSeeAllTap: () {
-                          controller.selectCategory(controller.allCategory);
+                          AppRouter.push(AppRoutes.categories);
                         },
                       ),
                     ),
@@ -251,13 +252,23 @@ class _HomeTabContent extends StatelessWidget {
                                 price: product.price?.toDouble() ?? 0.0,
                                 weight: product.category?.name ?? 'Grocery',
                                 isNew: index % 2 == 0,
-                                isFavorite: false,
-                                isAddedToCart: false,
-                                quantity: 5,
-                                onAdd: () {},
-                                onPlus: () {},
-                                onMinus: () {},
-                                onFavoriteTap: () {},
+                                isFavorite: controller.isFavorite(product),
+                                isAddedToCart: controller.isAddedToCart(
+                                  product,
+                                ),
+                                quantity: controller.quantityFor(product),
+                                onAdd: () {
+                                  controller.addToCart(product);
+                                },
+                                onPlus: () {
+                                  controller.increaseQty(product);
+                                },
+                                onMinus: () {
+                                  controller.decreaseQty(product);
+                                },
+                                onFavoriteTap: () {
+                                  controller.toggleFavorite(product);
+                                },
                                 onCardTap: () {
                                   AppRouter.push(
                                     AppRoutes.productDetailsById(
@@ -280,6 +291,417 @@ class _HomeTabContent extends StatelessWidget {
           ],
         );
       },
+    );
+  }
+}
+
+class _FavoritesTabContent extends StatelessWidget {
+  const _FavoritesTabContent();
+
+  @override
+  Widget build(BuildContext context) {
+    return GetBuilder<HomeController>(
+      id: 'favorites',
+      builder: (controller) {
+        final products = controller.favoriteProducts;
+        if (products.isEmpty) {
+          return const _EmptyTabMessage(
+            icon: Icons.favorite_border,
+            title: 'No favorites yet',
+            subtitle: 'Tap the heart on products you like.',
+          );
+        }
+
+        return _ProductListTab(
+          title: 'Favorite',
+          products: products,
+          itemBuilder: (product) {
+            return _FavoriteProductTile(product: product);
+          },
+        );
+      },
+    );
+  }
+}
+
+class _CartTabContent extends StatelessWidget {
+  const _CartTabContent();
+
+  @override
+  Widget build(BuildContext context) {
+    return GetBuilder<HomeController>(
+      id: 'cart',
+      builder: (controller) {
+        final products = controller.cartProducts;
+        if (products.isEmpty) {
+          return const _EmptyTabMessage(
+            icon: Icons.shopping_cart_outlined,
+            title: 'Cart is empty',
+            subtitle: 'Add products to see them here.',
+          );
+        }
+
+        return Column(
+          children: [
+            Expanded(
+              child: _ProductListTab(
+                title: 'Cart',
+                products: products,
+                itemBuilder: (product) {
+                  return _CartProductTile(product: product);
+                },
+              ),
+            ),
+            Container(
+              padding: EdgeInsets.fromLTRB(16.w, 12.h, 16.w, 16.h),
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                border: Border(top: BorderSide(color: Color(0xFFECECEC))),
+              ),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          'Total',
+                          style: TextStyle(
+                            color: AppColors.textSecondary,
+                            fontSize: 13.sp,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        SizedBox(height: 2.h),
+                        Text(
+                          '\$${controller.cartTotal.toStringAsFixed(2)}',
+                          style: TextStyle(
+                            color: AppColors.textPrimary,
+                            fontSize: 22.sp,
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  ElevatedButton(
+                    onPressed: () {
+                      AppRouter.push(AppRoutes.paymentMethod);
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.primaryDark,
+                      foregroundColor: Colors.white,
+                      elevation: 0,
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 28.w,
+                        vertical: 14.h,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8.r),
+                      ),
+                    ),
+                    child: const Text('Checkout'),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+}
+
+class _ProductListTab extends StatelessWidget {
+  const _ProductListTab({
+    required this.title,
+    required this.products,
+    required this.itemBuilder,
+  });
+
+  final String title;
+  final List<ProductModel> products;
+  final Widget Function(ProductModel product) itemBuilder;
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView.separated(
+      padding: EdgeInsets.fromLTRB(16.w, 16.h, 16.w, 16.h),
+      itemCount: products.length + 1,
+      separatorBuilder: (_, index) {
+        if (index == 0) return SizedBox(height: 12.h);
+        return SizedBox(height: 10.h);
+      },
+      itemBuilder: (context, index) {
+        if (index == 0) {
+          return AppText(
+            text: title,
+            fontSize: 24.sp,
+            fontWeight: FontWeight.w800,
+          );
+        }
+        return itemBuilder(products[index - 1]);
+      },
+    );
+  }
+}
+
+class _FavoriteProductTile extends StatelessWidget {
+  const _FavoriteProductTile({required this.product});
+
+  final ProductModel product;
+
+  @override
+  Widget build(BuildContext context) {
+    return GetBuilder<HomeController>(
+      id: 'favorites',
+      builder: (controller) {
+        return _ProductTileShell(
+          product: product,
+          trailing: IconButton(
+            onPressed: () {
+              controller.toggleFavorite(product);
+            },
+            icon: const Icon(Icons.favorite, color: Colors.red),
+          ),
+          bottom: Row(
+            children: [
+              Expanded(
+                child: Text(
+                  product.category?.name ?? 'Grocery',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    color: AppColors.textSecondary,
+                    fontSize: 12.sp,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+              TextButton(
+                onPressed: () {
+                  controller.addToCart(product);
+                },
+                child: Text(
+                  controller.isAddedToCart(product)
+                      ? 'Added (${controller.quantityFor(product)})'
+                      : 'Add to Cart',
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+}
+
+class _CartProductTile extends StatelessWidget {
+  const _CartProductTile({required this.product});
+
+  final ProductModel product;
+
+  @override
+  Widget build(BuildContext context) {
+    return GetBuilder<HomeController>(
+      id: 'cart',
+      builder: (controller) {
+        final quantity = controller.quantityFor(product);
+        return _ProductTileShell(
+          product: product,
+          trailing: IconButton(
+            onPressed: () {
+              controller.removeFromCart(product);
+            },
+            icon: const Icon(Icons.delete_outline, color: Color(0xFF8E8E93)),
+          ),
+          bottom: Row(
+            children: [
+              Text(
+                '\$${((product.price ?? 0) * quantity).toStringAsFixed(2)}',
+                style: TextStyle(
+                  color: AppColors.primaryDark,
+                  fontSize: 15.sp,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+              const Spacer(),
+              _SmallQtyButton(
+                icon: '-',
+                onTap: () {
+                  controller.decreaseQty(product);
+                },
+              ),
+              SizedBox(width: 10.w),
+              Text(
+                '$quantity',
+                style: TextStyle(
+                  color: Colors.black,
+                  fontSize: 18.sp,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+              SizedBox(width: 10.w),
+              _SmallQtyButton(
+                icon: '+',
+                onTap: () {
+                  controller.increaseQty(product);
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+}
+
+class _ProductTileShell extends StatelessWidget {
+  const _ProductTileShell({
+    required this.product,
+    required this.trailing,
+    required this.bottom,
+  });
+
+  final ProductModel product;
+  final Widget trailing;
+  final Widget bottom;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.all(10.r),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(8.r),
+        border: Border.all(color: const Color(0xFFEDEDED)),
+      ),
+      child: Row(
+        children: [
+          ClipRRect(
+            borderRadius: BorderRadius.circular(8.r),
+            child: Container(
+              width: 78.r,
+              height: 78.r,
+              color: const Color(0xFFF5F8F1),
+              child: _ProductImage(image: product.imageUrl),
+            ),
+          ),
+          SizedBox(width: 12.w),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      child: Text(
+                        product.title ?? '',
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          color: AppColors.textPrimary,
+                          fontSize: 15.sp,
+                          fontWeight: FontWeight.w800,
+                          height: 1.2,
+                        ),
+                      ),
+                    ),
+                    trailing,
+                  ],
+                ),
+                Text(
+                  '\$${(product.price ?? 0).toStringAsFixed(2)}',
+                  style: TextStyle(
+                    color: AppColors.primaryDark,
+                    fontSize: 15.sp,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+                SizedBox(height: 4.h),
+                bottom,
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _SmallQtyButton extends StatelessWidget {
+  const _SmallQtyButton({required this.icon, required this.onTap});
+
+  final String icon;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(14.r),
+      child: Container(
+        width: 28.r,
+        height: 28.r,
+        decoration: const BoxDecoration(
+          color: Color(0xFFE7F4D8),
+          shape: BoxShape.circle,
+        ),
+        child: Center(
+          child: Text(
+            icon,
+            style: TextStyle(
+              color: AppColors.primaryDark,
+              fontSize: 18.sp,
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _EmptyTabMessage extends StatelessWidget {
+  const _EmptyTabMessage({
+    required this.icon,
+    required this.title,
+    required this.subtitle,
+  });
+
+  final IconData icon;
+  final String title;
+  final String subtitle;
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Padding(
+        padding: EdgeInsets.symmetric(horizontal: 28.w),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon, color: AppColors.primaryDark, size: 48.sp),
+            SizedBox(height: 12.h),
+            AppText(
+              text: title,
+              fontSize: 22.sp,
+              fontWeight: FontWeight.w800,
+              textAlign: TextAlign.center,
+            ),
+            SizedBox(height: 6.h),
+            AppText(
+              text: subtitle,
+              color: AppColors.textSecondary,
+              fontSize: 14.sp,
+              fontWeight: FontWeight.w500,
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

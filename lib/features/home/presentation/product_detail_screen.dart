@@ -2,9 +2,11 @@ import 'package:biggroceryapp/core/global_widgets/app_elevated_button.dart';
 import 'package:biggroceryapp/core/global_widgets/app_text.dart';
 import 'package:biggroceryapp/core/global_widgets/custom_appbar_widget.dart';
 import 'package:biggroceryapp/core/utils/app_colors.dart';
+import 'package:biggroceryapp/features/home/logic/home_controller.dart';
 import 'package:biggroceryapp/features/home/model/api_product_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get/get_state_manager/src/simple/get_state.dart';
 
 class ProductDetailScreen extends StatefulWidget {
   const ProductDetailScreen({super.key, required this.product});
@@ -16,9 +18,6 @@ class ProductDetailScreen extends StatefulWidget {
 }
 
 class _ProductDetailScreenState extends State<ProductDetailScreen> {
-  bool _isFavorite = false;
-  int _quantity = 1;
-
   ProductModel? get product => widget.product;
 
   @override
@@ -37,179 +36,189 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       );
     }
 
-    return Scaffold(
-      backgroundColor: AppColors.backgroundGrey,
-      appBar: const AppBarWidget(
-        showBackButton: true,
-        backgroundColor: AppColors.primaryLight,
-      ),
-      body: Column(
-        children: [
-          _ProductHero(image: product.imageUrl),
-          SizedBox(height: 58.h),
-          Expanded(
-            child: Container(
-              width: double.infinity,
-              decoration: BoxDecoration(
-                color: const Color(0xFFF5F5F7),
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(20.r),
-                  topRight: Radius.circular(20.r),
-                ),
-              ),
-              child: Padding(
-                padding: EdgeInsets.fromLTRB(18.w, 20.h, 18.w, 18.h),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
+    return GetBuilder<HomeController>(
+      id: 'product_detail_${product.id}',
+      builder: (controller) {
+        final isFavorite = controller.isFavorite(product);
+        final cartQuantity = controller.quantityFor(product);
+
+        return Scaffold(
+          backgroundColor: AppColors.backgroundGrey,
+          appBar: const AppBarWidget(
+            showBackButton: true,
+            backgroundColor: AppColors.primaryLight,
+          ),
+          body: Column(
+            children: [
+              _ProductHero(image: product.imageUrl),
+              SizedBox(height: 58.h),
+              Expanded(
+                child: Container(
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFF5F5F7),
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(20.r),
+                      topRight: Radius.circular(20.r),
+                    ),
+                  ),
+                  child: Padding(
+                    padding: EdgeInsets.fromLTRB(18.w, 20.h, 18.w, 18.h),
+                    child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  AppText(
-                                    text:
-                                        '\$${(product.price ?? 0).toStringAsFixed(2)}',
-                                    color: const Color(0xFF34C759),
-                                    fontSize: 22.sp,
-                                    fontWeight: FontWeight.w800,
-                                  ),
-                                  SizedBox(width: 10.w),
-                                  Flexible(
-                                    child: Container(
-                                      padding: EdgeInsets.symmetric(
-                                        horizontal: 10.w,
-                                        vertical: 5.h,
+                                  Row(
+                                    children: [
+                                      AppText(
+                                        text:
+                                            '\$${(product.price ?? 0).toStringAsFixed(2)}',
+                                        color: const Color(0xFF34C759),
+                                        fontSize: 22.sp,
+                                        fontWeight: FontWeight.w800,
                                       ),
-                                      decoration: BoxDecoration(
-                                        color: AppColors.primaryLight,
-                                        borderRadius: BorderRadius.circular(
-                                          20.r,
+                                      SizedBox(width: 10.w),
+                                      Flexible(
+                                        child: Container(
+                                          padding: EdgeInsets.symmetric(
+                                            horizontal: 10.w,
+                                            vertical: 5.h,
+                                          ),
+                                          decoration: BoxDecoration(
+                                            color: AppColors.primaryLight,
+                                            borderRadius: BorderRadius.circular(
+                                              20.r,
+                                            ),
+                                          ),
+                                          child: AppText(
+                                            text:
+                                                product.category?.name ??
+                                                'Grocery',
+                                            color: AppColors.primaryDark,
+                                            fontSize: 12.sp,
+                                            fontWeight: FontWeight.w700,
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
                                         ),
                                       ),
-                                      child: AppText(
-                                        text:
-                                            product.category?.name ?? 'Grocery',
-                                        color: AppColors.primaryDark,
-                                        fontSize: 12.sp,
-                                        fontWeight: FontWeight.w700,
-                                        maxLines: 1,
-                                        overflow: TextOverflow.ellipsis,
-                                      ),
-                                    ),
+                                    ],
+                                  ),
+                                  SizedBox(height: 8.h),
+                                  AppText(
+                                    text: product.title ?? 'Product',
+                                    color: Colors.black,
+                                    fontSize: 22.sp,
+                                    fontWeight: FontWeight.w700,
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
                                   ),
                                 ],
                               ),
-                              SizedBox(height: 8.h),
+                            ),
+                            InkWell(
+                              onTap: () {
+                                controller.toggleFavorite(product);
+                              },
+                              borderRadius: BorderRadius.circular(20.r),
+                              child: Padding(
+                                padding: EdgeInsets.all(4.r),
+                                child: Icon(
+                                  isFavorite
+                                      ? Icons.favorite
+                                      : Icons.favorite_border,
+                                  color: isFavorite
+                                      ? Colors.red
+                                      : const Color(0xFF8E8E93),
+                                  size: 24.sp,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: 12.h),
+                        const _RatingRow(),
+                        SizedBox(height: 16.h),
+                        AppText(
+                          text: 'Description',
+                          color: Colors.black,
+                          fontSize: 17.sp,
+                          fontWeight: FontWeight.w700,
+                        ),
+                        SizedBox(height: 8.h),
+                        Expanded(
+                          child: SingleChildScrollView(
+                            padding: EdgeInsets.only(right: 4.w),
+                            child: Text(
+                              _descriptionFor(product),
+                              style: TextStyle(
+                                color: const Color(0xFF8E8E93),
+                                fontSize: 15.sp,
+                                height: 1.7,
+                                fontWeight: FontWeight.w400,
+                              ),
+                            ),
+                          ),
+                        ),
+                        SizedBox(height: 16.h),
+                        _QuantitySelector(
+                          quantity: cartQuantity == 0 ? 1 : cartQuantity,
+                          onDecrease: () {
+                            controller.decreaseQty(product);
+                          },
+                          onIncrease: () {
+                            controller.increaseQty(product);
+                          },
+                        ),
+                        SizedBox(height: 18.h),
+                        AppElevatedButton(
+                          height: 58.h,
+                          borderRadius: BorderRadius.circular(8.r),
+                          gradient: const LinearGradient(
+                            colors: [Color(0xFFA8DB7A), Color(0xFF6FD12E)],
+                          ),
+                          onPressed: () {
+                            if (cartQuantity == 0) {
+                              controller.addToCart(product);
+                            } else {
+                              controller.increaseQty(product);
+                            }
+                          },
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
                               AppText(
-                                text: product.title ?? 'Product',
-                                color: Colors.black,
-                                fontSize: 22.sp,
-                                fontWeight: FontWeight.w700,
-                                maxLines: 2,
-                                overflow: TextOverflow.ellipsis,
+                                text: cartQuantity == 0
+                                    ? 'Add to cart'
+                                    : 'Added ($cartQuantity)',
+                                color: Colors.white,
+                                fontSize: 18.sp,
+                                fontWeight: FontWeight.w600,
+                              ),
+                              SizedBox(width: 10.w),
+                              Icon(
+                                Icons.shopping_bag_outlined,
+                                color: Colors.white,
+                                size: 22.sp,
                               ),
                             ],
                           ),
                         ),
-                        InkWell(
-                          onTap: () {
-                            setState(() {
-                              _isFavorite = !_isFavorite;
-                            });
-                          },
-                          borderRadius: BorderRadius.circular(20.r),
-                          child: Padding(
-                            padding: EdgeInsets.all(4.r),
-                            child: Icon(
-                              _isFavorite
-                                  ? Icons.favorite
-                                  : Icons.favorite_border,
-                              color: _isFavorite
-                                  ? Colors.red
-                                  : const Color(0xFF8E8E93),
-                              size: 24.sp,
-                            ),
-                          ),
-                        ),
                       ],
                     ),
-                    SizedBox(height: 12.h),
-                    const _RatingRow(),
-                    SizedBox(height: 16.h),
-                    AppText(
-                      text: 'Description',
-                      color: Colors.black,
-                      fontSize: 17.sp,
-                      fontWeight: FontWeight.w700,
-                    ),
-                    SizedBox(height: 8.h),
-                    Expanded(
-                      child: SingleChildScrollView(
-                        padding: EdgeInsets.only(right: 4.w),
-                        child: Text(
-                          _descriptionFor(product),
-                          style: TextStyle(
-                            color: const Color(0xFF8E8E93),
-                            fontSize: 15.sp,
-                            height: 1.7,
-                            fontWeight: FontWeight.w400,
-                          ),
-                        ),
-                      ),
-                    ),
-                    SizedBox(height: 16.h),
-                    _QuantitySelector(
-                      quantity: _quantity,
-                      onDecrease: () {
-                        if (_quantity == 1) return;
-                        setState(() {
-                          _quantity--;
-                        });
-                      },
-                      onIncrease: () {
-                        setState(() {
-                          _quantity++;
-                        });
-                      },
-                    ),
-                    SizedBox(height: 18.h),
-                    AppElevatedButton(
-                      height: 58.h,
-                      borderRadius: BorderRadius.circular(8.r),
-                      gradient: const LinearGradient(
-                        colors: [Color(0xFFA8DB7A), Color(0xFF6FD12E)],
-                      ),
-                      onPressed: () {},
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          AppText(
-                            text: 'Add to cart',
-                            color: Colors.white,
-                            fontSize: 18.sp,
-                            fontWeight: FontWeight.w600,
-                          ),
-                          SizedBox(width: 10.w),
-                          Icon(
-                            Icons.shopping_bag_outlined,
-                            color: Colors.white,
-                            size: 22.sp,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
+                  ),
                 ),
               ),
-            ),
+            ],
           ),
-        ],
-      ),
+        );
+      },
     );
   }
 
