@@ -114,6 +114,9 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                                   AppText(
                                     text: product.title ?? 'Product',
                                     color: Colors.black,
+                                    text:
+                                        '\$${product.price.toStringAsFixed(2)}',
+                                    color: const Color(0xFF34C759),
                                     fontSize: 22.sp,
                                     fontWeight: FontWeight.w700,
                                     maxLines: 2,

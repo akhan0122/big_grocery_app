@@ -30,11 +30,11 @@ class LandingScreen extends GetView<LandingController> {
           children: [
             // ✅ Top image goes behind status bar
             Expanded(
-              child: Stack(
-                children: [
-                  SizedBox(
-                    width: double.infinity,
-                    child: ClipPath(
+              child: SizedBox(
+                width: double.infinity,
+                child: Stack(
+                  children: [
+                    ClipPath(
                       clipper: InwardBottomClipper(),
                       child: PageView.builder(
                         controller: controller.pageController,

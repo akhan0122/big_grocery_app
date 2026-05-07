@@ -82,7 +82,10 @@ class AppBarWidget extends StatelessWidget implements PreferredSizeWidget {
       elevation: 0,
       centerTitle: centerTitle,
       automaticallyImplyLeading: false,
+      surfaceTintColor: Colors.transparent,
+      shadowColor: Colors.transparent,
 
+      scrolledUnderElevation: 0,
       // ── Leading ───────────────────────────────────────────
       leading: showBackButton
           ? IconButton(

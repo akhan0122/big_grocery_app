@@ -30,6 +30,11 @@ class LandingController extends GetxController {
     AssetPng.landingPage4,
   ];
   final PageController pageController = PageController();
+
+  void skipToLogin() {
+    AppRouter.go(AppRoutes.loginScreen);
+  }
+
   void nextPage() {
     if (currentPage < imagesList.length - 1) {
       pageController.nextPage(

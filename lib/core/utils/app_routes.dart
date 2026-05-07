@@ -7,6 +7,9 @@ class AppRoutes {
   static const String homeScreen = '/homeScreen';
   static const String categories = '/categories';
   static const String paymentMethod = '/paymentMethod';
+  static const String profileScreen = '/profileScreen';
+  static const String favoritesScreen = '/favoritesScreen';
+  static const String cartScreen = '/cartScreen';
   static const String productDetails = '/productDetails/:id';
 
   static String productDetailsById(int id) => '/productDetails/$id';

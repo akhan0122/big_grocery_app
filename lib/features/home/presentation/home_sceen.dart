@@ -8,6 +8,8 @@ import 'package:biggroceryapp/core/utils/theme/assets_class/asset_png.dart';
 import 'package:biggroceryapp/features/home/logic/home_controller.dart';
 import 'package:biggroceryapp/features/home/model/api_product_model.dart';
 import 'package:biggroceryapp/features/home/widgets/category_card.dart';
+import 'package:biggroceryapp/features/home/widgets/home_bottom_navigation_bar.dart';
+import 'package:biggroceryapp/features/home/widgets/product_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -32,6 +34,7 @@ class _HomeScreenState extends State<HomeScreen> {
         statusBarBrightness: Brightness.light,
       ),
       child: Scaffold(
+        backgroundColor: AppColors.backgroundGrey,
         body: SafeArea(
           child: IndexedStack(
             index: _currentIndex,

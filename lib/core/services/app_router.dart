@@ -8,6 +8,10 @@ import 'package:biggroceryapp/features/home/model/api_product_model.dart';
 import 'package:biggroceryapp/features/home/presentation/categories_screen.dart';
 import 'package:biggroceryapp/features/home/presentation/home_sceen.dart';
 import 'package:biggroceryapp/features/home/presentation/payment_method_screen.dart';
+import 'package:biggroceryapp/features/home/presentation/cart_screen.dart';
+import 'package:biggroceryapp/features/home/presentation/favorites_screen.dart';
+import 'package:biggroceryapp/features/home/presentation/home_sceen.dart';
+import 'package:biggroceryapp/features/home/presentation/profile_screen.dart';
 import 'package:biggroceryapp/features/home/presentation/product_detail_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -110,6 +114,22 @@ class AppRouter {
           return null;
         },
       ),
+      GoRoute(
+        path: AppRoutes.profileScreen,
+        name: AppRoutes.profileScreen,
+        builder: (context, state) => const ProfileScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.favoritesScreen,
+        name: AppRoutes.favoritesScreen,
+        builder: (context, state) => const FavoritesScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.cartScreen,
+        name: AppRoutes.cartScreen,
+        builder: (context, state) => const CartScreen(),
+      ),
+
       GoRoute(
         path: AppRoutes.productDetails,
         name: AppRoutes.productDetails,
