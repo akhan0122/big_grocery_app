@@ -1,9 +1,7 @@
 import 'package:biggroceryapp/core/global_widgets/app_text.dart';
 import 'package:biggroceryapp/core/global_widgets/section_title.dart';
 import 'package:biggroceryapp/core/global_widgets/text_form_field_widget.dart';
-import 'package:biggroceryapp/core/services/app_router.dart';
 import 'package:biggroceryapp/core/utils/app_colors.dart';
-import 'package:biggroceryapp/core/utils/app_routes.dart';
 import 'package:biggroceryapp/core/utils/theme/assets_class/asset_png.dart';
 import 'package:biggroceryapp/features/home/logic/home_controller.dart';
 import 'package:biggroceryapp/features/home/widgets/category_card.dart';
@@ -11,7 +9,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get_state_manager/src/simple/get_state.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -123,8 +120,7 @@ class _HomeTabContent extends StatelessWidget {
                         ],
                       ),
                     ),
-                    SizedBox(height: 20.h),
-                    const _ApiProductsSection(),
+
                     SizedBox(height: 20.h),
                     Padding(
                       padding: EdgeInsets.symmetric(horizontal: 16.w),
@@ -159,55 +155,68 @@ class _HomeTabContent extends StatelessWidget {
                       ),
                     ),
                     SizedBox(height: 12.h),
-                    Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 16.w),
-                      child: GridView.builder(
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
-                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 2,
-                          crossAxisSpacing: 12.w,
-                          mainAxisSpacing: 12.h,
-                          childAspectRatio: 0.74,
-                        ),
-                        itemCount: controller.dummyProducts.length,
-                        itemBuilder: (context, index) {
-                          return GetBuilder<HomeController>(
-                            id: 'product_$index',
-                            builder: (controller) {
-                              final product = controller.dummyProducts[index];
+                    GetBuilder<HomeController>(
+                      id: 'api_products',
+                      builder: (controller) {
+                        if (controller.isLoadingProducts) {
+                          return Padding(
+                            padding: EdgeInsets.symmetric(vertical: 28.h),
+                            child: const Center(
+                              child: CircularProgressIndicator(),
+                            ),
+                          );
+                        }
+
+                        final error = controller.productsError;
+                        if (error != null) {
+                          return _ProductsMessage(
+                            message: error,
+                            actionText: 'Retry',
+                            onActionTap: controller.getProductsFromApi,
+                          );
+                        }
+
+                        if (controller.apiProducts.isEmpty) {
+                          return const _ProductsMessage(
+                            message: 'No products found.',
+                          );
+                        }
+
+                        return Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 16.w),
+                          child: GridView.builder(
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            gridDelegate:
+                                SliverGridDelegateWithFixedCrossAxisCount(
+                                  crossAxisCount: 2,
+                                  crossAxisSpacing: 12.w,
+                                  mainAxisSpacing: 12.h,
+                                  childAspectRatio: 0.66,
+                                ),
+                            itemCount: controller.apiProducts.length,
+                            itemBuilder: (context, index) {
+                              final product = controller.apiProducts[index];
 
                               return ProductCard(
-                                name: product.name,
+                                name: product.title ?? '',
                                 image: product.imageUrl,
-                                price: product.price,
-                                weight: product.weight,
-                                isNew: product.isNew,
-                                isFavorite: product.isFavorite,
-                                isAddedToCart: product.isAddedToCart,
-                                quantity: product.quantity,
-                                onAdd: () {
-                                  controller.addToCart(product);
-                                },
-                                onPlus: () {
-                                  controller.increaseQty(product);
-                                },
-                                onMinus: () {
-                                  controller.decreaseQty(product);
-                                },
-                                onFavoriteTap: () {
-                                  controller.toggleFavorite(product);
-                                },
-                                onCardTap: () {
-                                  AppRouter.push(
-                                    AppRoutes.productDetailsById(product.id),
-                                  );
-                                },
+                                price: product.price?.toDouble() ?? 0.0,
+                                weight: product.category?.name ?? 'Grocery',
+                                isNew: index % 2 == 0,
+                                isFavorite: false,
+                                isAddedToCart: false,
+                                quantity: 5,
+                                onAdd: () {},
+                                onPlus: () {},
+                                onMinus: () {},
+                                onFavoriteTap: () {},
+                                onCardTap: () {},
                               );
                             },
-                          );
-                        },
-                      ),
+                          ),
+                        );
+                      },
                     ),
                     SizedBox(height: 20.h),
                   ],
@@ -215,116 +224,6 @@ class _HomeTabContent extends StatelessWidget {
               ),
             ),
           ],
-        );
-      },
-    );
-  }
-}
-
-class _ApiProductsSection extends StatelessWidget {
-  const _ApiProductsSection();
-
-  @override
-  Widget build(BuildContext context) {
-    return GetBuilder<HomeController>(
-      id: 'api_products',
-      builder: (controller) {
-        return Padding(
-          padding: EdgeInsets.symmetric(horizontal: 16.w),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SectionHeaderWidget(
-                title: 'Live Products',
-                showSeeAll: false,
-              ),
-              SizedBox(height: 12.h),
-              if (controller.isLoadingProducts)
-                SizedBox(
-                  height: 82.h,
-                  child: const Center(child: CircularProgressIndicator()),
-                )
-              else if (controller.productsError != null)
-                Container(
-                  height: 82.h,
-                  width: double.infinity,
-                  padding: EdgeInsets.symmetric(horizontal: 12.w),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFFFF1F1),
-                    borderRadius: BorderRadius.circular(4.r),
-                    border: Border.all(color: const Color(0xFFFFD0D0)),
-                  ),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: Text(
-                          controller.productsError!,
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
-                            color: Colors.red.shade700,
-                            fontSize: 13.sp,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ),
-                      IconButton(
-                        onPressed: controller.getProductsFromApi,
-                        icon: const Icon(Icons.refresh),
-                        color: Colors.red.shade700,
-                        tooltip: 'Retry',
-                      ),
-                    ],
-                  ),
-                )
-              else
-                SizedBox(
-                  height: 82.h,
-                  child: ListView.separated(
-                    scrollDirection: Axis.horizontal,
-                    itemCount: controller.apiProducts.length,
-                    separatorBuilder: (_, __) => SizedBox(width: 10.w),
-                    itemBuilder: (context, index) {
-                      final product = controller.apiProducts[index];
-                      return Container(
-                        width: 170.w,
-                        padding: EdgeInsets.all(10.r),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFF7FAF4),
-                          borderRadius: BorderRadius.circular(4.r),
-                          border: Border.all(color: const Color(0xFFE3ECD9)),
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              product.title,
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(
-                                color: AppColors.textPrimary,
-                                fontSize: 13.sp,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                            SizedBox(height: 4.h),
-                            Text(
-                              '\$${product.price.toStringAsFixed(2)}',
-                              style: TextStyle(
-                                color: AppColors.primaryDark,
-                                fontSize: 15.sp,
-                                fontWeight: FontWeight.w700,
-                              ),
-                            ),
-                          ],
-                        ),
-                      );
-                    },
-                  ),
-                ),
-            ],
-          ),
         );
       },
     );
@@ -344,6 +243,86 @@ class _SimpleTabContent extends StatelessWidget {
         fontSize: 24.sp,
         fontWeight: FontWeight.w700,
       ),
+    );
+  }
+}
+
+class _ProductsMessage extends StatelessWidget {
+  const _ProductsMessage({
+    required this.message,
+    this.actionText,
+    this.onActionTap,
+  });
+
+  final String message;
+  final String? actionText;
+  final VoidCallback? onActionTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 28.h),
+      child: Center(
+        child: Column(
+          children: [
+            Text(
+              message,
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: const Color(0xFF616161),
+                fontSize: 15.sp,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+            if (actionText != null && onActionTap != null) ...[
+              SizedBox(height: 12.h),
+              TextButton(onPressed: onActionTap, child: Text(actionText!)),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _ProductImage extends StatelessWidget {
+  const _ProductImage({required this.image});
+
+  final String image;
+
+  @override
+  Widget build(BuildContext context) {
+    if (image.isEmpty) {
+      return Icon(
+        Icons.shopping_basket_outlined,
+        color: AppColors.primaryDark,
+        size: 38.sp,
+      );
+    }
+
+    return Image.network(
+      image,
+      fit: BoxFit.cover,
+      loadingBuilder: (context, child, progress) {
+        if (progress == null) return child;
+        return Center(
+          child: SizedBox(
+            width: 20.r,
+            height: 20.r,
+            child: CircularProgressIndicator(
+              strokeWidth: 2,
+              color: AppColors.primaryDark,
+            ),
+          ),
+        );
+      },
+      errorBuilder: (_, __, ___) {
+        return Icon(
+          Icons.shopping_basket_outlined,
+          color: AppColors.primaryDark,
+          size: 38.sp,
+        );
+      },
     );
   }
 }
@@ -384,10 +363,18 @@ class ProductCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
+      clipBehavior: Clip.antiAlias,
       decoration: BoxDecoration(
-        color: const Color(0xFFF2F2F2),
-        borderRadius: BorderRadius.circular(4.r),
-        border: Border.all(color: const Color(0xFFE5E5E5), width: 1),
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(8.r),
+        border: Border.all(color: const Color(0xFFE9E9E9), width: 1),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.04),
+            blurRadius: 10.r,
+            offset: Offset(0, 4.h),
+          ),
+        ],
       ),
       child: Column(
         children: [
@@ -396,107 +383,110 @@ class ProductCard extends StatelessWidget {
               color: Colors.transparent,
               child: InkWell(
                 onTap: onCardTap,
-                borderRadius: BorderRadius.circular(4.r),
+                borderRadius: BorderRadius.circular(8.r),
                 child: Padding(
-                  padding: EdgeInsets.fromLTRB(8.w, 6.h, 8.w, 8.h),
+                  padding: EdgeInsets.fromLTRB(10.w, 10.h, 10.w, 8.h),
                   child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          isNew
-                              ? Container(
+                      SizedBox(
+                        height: 116.h,
+                        width: double.infinity,
+                        child: Stack(
+                          children: [
+                            Positioned.fill(
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFFF5F8F1),
+                                  borderRadius: BorderRadius.circular(8.r),
+                                ),
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(8.r),
+                                  child: _ProductImage(image: image),
+                                ),
+                              ),
+                            ),
+                            if (isNew)
+                              Positioned(
+                                top: 8.h,
+                                left: 8.w,
+                                child: Container(
                                   padding: EdgeInsets.symmetric(
-                                    horizontal: 10.w,
+                                    horizontal: 8.w,
                                     vertical: 4.h,
                                   ),
-                                  decoration: const BoxDecoration(
-                                    color: Color(0xFFEFE4CB),
-                                    borderRadius: BorderRadius.only(
-                                      topLeft: Radius.circular(4),
-                                      bottomRight: Radius.circular(6),
-                                    ),
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFFFFF5D8),
+                                    borderRadius: BorderRadius.circular(4.r),
                                   ),
                                   child: Text(
                                     'NEW',
                                     style: TextStyle(
                                       color: const Color(0xFFD39E2E),
-                                      fontSize: 12.sp,
-                                      fontWeight: FontWeight.w600,
+                                      fontSize: 10.sp,
+                                      fontWeight: FontWeight.w700,
                                     ),
                                   ),
-                                )
-                              : SizedBox(width: 44.w),
-                          const Spacer(),
-                          InkWell(
-                            onTap: onFavoriteTap,
-                            borderRadius: BorderRadius.circular(20.r),
-                            child: Padding(
-                              padding: EdgeInsets.only(top: 2.h, right: 2.w),
-                              child: Icon(
-                                isFavorite
-                                    ? Icons.favorite
-                                    : Icons.favorite_border,
-                                color: isFavorite
-                                    ? Colors.red
-                                    : const Color(0xFF8D8D8D),
-                                size: 22.sp,
+                                ),
                               ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      SizedBox(height: 6.h),
-                      Expanded(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Container(
-                              width: 80.r,
-                              height: 80.r,
-                              decoration: const BoxDecoration(
-                                color: Color(0xFFE6EDC9),
-                                shape: BoxShape.circle,
-                              ),
-                              child: Padding(
-                                padding: EdgeInsets.all(18.r),
-                                child: SvgPicture.asset(
-                                  image,
-                                  fit: BoxFit.contain,
+                            Positioned(
+                              top: 6.h,
+                              right: 6.w,
+                              child: Material(
+                                color: Colors.white.withValues(alpha: 0.9),
+                                shape: const CircleBorder(),
+                                child: InkWell(
+                                  onTap: onFavoriteTap,
+                                  customBorder: const CircleBorder(),
+                                  child: SizedBox(
+                                    width: 30.r,
+                                    height: 30.r,
+                                    child: Icon(
+                                      isFavorite
+                                          ? Icons.favorite
+                                          : Icons.favorite_border,
+                                      color: isFavorite
+                                          ? Colors.red
+                                          : const Color(0xFF8D8D8D),
+                                      size: 18.sp,
+                                    ),
+                                  ),
                                 ),
                               ),
                             ),
-                            SizedBox(height: 6.h),
-                            Text(
-                              '\$${price.toStringAsFixed(2)}',
-                              style: TextStyle(
-                                fontSize: 18.sp,
-                                color: AppColors.primaryDark,
-                                fontWeight: FontWeight.w700,
-                              ),
-                            ),
-                            SizedBox(height: 2.h),
-                            Text(
-                              name,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                color: Colors.black,
-                                fontWeight: FontWeight.w700,
-                                fontSize: 16.sp,
-                              ),
-                            ),
-                            SizedBox(height: 2.h),
-                            Text(
-                              weight,
-                              style: TextStyle(
-                                color: const Color(0xFF8C8C8C),
-                                fontSize: 13.sp,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
                           ],
+                        ),
+                      ),
+                      SizedBox(height: 9.h),
+                      Text(
+                        '\$${price.toStringAsFixed(2)}',
+                        style: TextStyle(
+                          fontSize: 17.sp,
+                          color: AppColors.primaryDark,
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
+                      SizedBox(height: 4.h),
+                      Text(
+                        name,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          color: AppColors.textPrimary,
+                          fontWeight: FontWeight.w700,
+                          fontSize: 14.sp,
+                          height: 1.15,
+                        ),
+                      ),
+                      SizedBox(height: 4.h),
+                      Text(
+                        weight,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          color: AppColors.textSecondary,
+                          fontSize: 12.sp,
+                          fontWeight: FontWeight.w500,
                         ),
                       ),
                     ],
@@ -507,9 +497,10 @@ class ProductCard extends StatelessWidget {
           ),
           isAddedToCart
               ? Container(
-                  height: 42.h,
+                  height: 44.h,
                   decoration: const BoxDecoration(
-                    border: Border(top: BorderSide(color: Color(0xFFDCDCDC))),
+                    color: Color(0xFFF8FBF4),
+                    border: Border(top: BorderSide(color: Color(0xFFE5EEDC))),
                   ),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -518,8 +509,8 @@ class ProductCard extends StatelessWidget {
                         onTap: onMinus,
                         borderRadius: BorderRadius.circular(16.r),
                         child: Container(
-                          width: 28.w,
-                          height: 28.h,
+                          width: 28.r,
+                          height: 28.r,
                           decoration: const BoxDecoration(
                             color: Color(0xFFE7F4D8),
                             shape: BoxShape.circle,
@@ -528,7 +519,7 @@ class ProductCard extends StatelessWidget {
                             child: Text(
                               '-',
                               style: TextStyle(
-                                color: const Color(0xFF7AC943),
+                                color: AppColors.primaryDark,
                                 fontSize: 20.sp,
                                 fontWeight: FontWeight.w600,
                               ),
@@ -540,16 +531,16 @@ class ProductCard extends StatelessWidget {
                         '$quantity',
                         style: TextStyle(
                           color: Colors.black,
-                          fontSize: 28.sp,
-                          fontWeight: FontWeight.w600,
+                          fontSize: 22.sp,
+                          fontWeight: FontWeight.w700,
                         ),
                       ),
                       InkWell(
                         onTap: onPlus,
                         borderRadius: BorderRadius.circular(16.r),
                         child: Container(
-                          width: 28.w,
-                          height: 28.h,
+                          width: 28.r,
+                          height: 28.r,
                           decoration: const BoxDecoration(
                             color: Color(0xFFE7F4D8),
                             shape: BoxShape.circle,
@@ -558,7 +549,7 @@ class ProductCard extends StatelessWidget {
                             child: Text(
                               '+',
                               style: TextStyle(
-                                color: const Color(0xFF7AC943),
+                                color: AppColors.primaryDark,
                                 fontSize: 20.sp,
                                 fontWeight: FontWeight.w600,
                               ),
@@ -572,17 +563,19 @@ class ProductCard extends StatelessWidget {
               : InkWell(
                   onTap: onAdd,
                   child: Container(
-                    height: 42.h,
+                    height: 44.h,
+                    width: double.infinity,
                     decoration: const BoxDecoration(
-                      border: Border(top: BorderSide(color: Color(0xFFDCDCDC))),
+                      color: Color(0xFFF8FBF4),
+                      border: Border(top: BorderSide(color: Color(0xFFE5EEDC))),
                     ),
                     child: Center(
                       child: Text(
                         'Add to Cart',
                         style: TextStyle(
                           color: AppColors.primaryDark,
-                          fontSize: 15.sp,
-                          fontWeight: FontWeight.w600,
+                          fontSize: 14.sp,
+                          fontWeight: FontWeight.w700,
                         ),
                       ),
                     ),

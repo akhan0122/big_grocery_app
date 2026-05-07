@@ -23,8 +23,8 @@ class CategoryItemWidget extends StatelessWidget {
             width: 50.r,
             height: 50.r,
             decoration: BoxDecoration(
-              color: category.bgColor.withOpacity(
-                0.1,
+              color: category.bgColor.withValues(
+                alpha: 0.1,
               ), // unique color per category
               shape: BoxShape.circle,
             ),

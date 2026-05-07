@@ -8,18 +8,20 @@ class HomeRepository {
 
   final ApiClient _apiClient;
 
-  Future<List<ApiProductModel>> getProducts() async {
-    final response = await _apiClient.get<Map<String, dynamic>>(
-      ApiEndpoints.products,
-      queryParameters: {'limit': 5, 'select': 'title,price'},
-    );
+  Future<List<ProductModel>> getProducts() async {
+    final response = await _apiClient.get<Object?>(ApiEndpoints.products);
 
-    final products = response.data?['products'];
+    final data = response.data;
+    final products = data is List
+        ? data
+        : data is Map<String, dynamic>
+        ? data['products']
+        : null;
     if (products is! List) return [];
 
     return products
-        .whereType<Map<String, dynamic>>()
-        .map(ApiProductModel.fromJson)
+        .whereType<Map>()
+        .map((product) => ProductModel.fromJson(product.cast<String, dynamic>()))
         .toList();
   }
 }

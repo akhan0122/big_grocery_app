@@ -3,7 +3,7 @@ class ApiEndpoints {
 
   static const String baseUrl = String.fromEnvironment(
     'API_BASE_URL',
-    defaultValue: 'https://dummyjson.com',
+    defaultValue: 'https://api.escuelajs.co/api/v1',
   );
 
   static const String login = '/auth/login';

@@ -5,7 +5,6 @@ import 'package:biggroceryapp/features/authentication/presentation/create_accoun
 import 'package:biggroceryapp/features/authentication/presentation/login_screen.dart';
 import 'package:biggroceryapp/features/home/logic/home_controller.dart';
 import 'package:biggroceryapp/features/home/presentation/home_sceen.dart';
-import 'package:biggroceryapp/features/home/presentation/product_detail_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:get/get.dart';
@@ -93,8 +92,8 @@ class AppRouter {
         path: AppRoutes.productDetails,
         name: AppRoutes.productDetails,
         builder: (context, state) {
-          final productId = int.tryParse(state.pathParameters['id'] ?? '');
-          return ProductDetailScreen(productId: productId);
+          int.tryParse(state.pathParameters['id'] ?? '');
+          return Text('fg');
         },
         redirect: (context, state) {
           _register<HomeController>(() => HomeController());
@@ -110,7 +109,8 @@ class AppRouter {
     }
   }
 
-  static void go(String route, {Object? extra}) => router.go(route, extra: extra);
+  static void go(String route, {Object? extra}) =>
+      router.go(route, extra: extra);
   static Future<T?> push<T>(String route, {Object? extra}) =>
       router.push<T>(route, extra: extra);
   static void pop(BuildContext context) => GoRouter.of(context).pop();
