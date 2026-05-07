@@ -6,9 +6,15 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 class CategoryItemWidget extends StatelessWidget {
-  const CategoryItemWidget({super.key, required this.category, this.onTap});
+  const CategoryItemWidget({
+    super.key,
+    required this.category,
+    this.isSelected = false,
+    this.onTap,
+  });
 
   final CategoryModel category;
+  final bool isSelected;
   final VoidCallback? onTap;
 
   @override
@@ -20,13 +26,17 @@ class CategoryItemWidget extends StatelessWidget {
         children: [
           // ── Icon circle ──────────────────────────────────
           Container(
-            width: 50.r,
-            height: 50.r,
+            width: 54.r,
+            height: 54.r,
             decoration: BoxDecoration(
               color: category.bgColor.withValues(
-                alpha: 0.1,
-              ), // unique color per category
+                alpha: isSelected ? 0.18 : 0.1,
+              ),
               shape: BoxShape.circle,
+              border: Border.all(
+                color: isSelected ? category.bgColor : Colors.transparent,
+                width: 1.4,
+              ),
             ),
             child: Padding(
               padding: EdgeInsets.all(12.r),
@@ -41,8 +51,8 @@ class CategoryItemWidget extends StatelessWidget {
             category.name,
             style: TextStyle(
               fontSize: 11.sp,
-              fontWeight: FontWeight.w500,
-              color: const Color(0xFF868889),
+              fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+              color: isSelected ? category.bgColor : const Color(0xFF868889),
             ),
             textAlign: TextAlign.center,
             maxLines: 1,

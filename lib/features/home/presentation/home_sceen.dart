@@ -129,25 +129,64 @@ class _HomeTabContent extends StatelessWidget {
                       padding: EdgeInsets.symmetric(horizontal: 16.w),
                       child: SectionHeaderWidget(
                         title: 'Categories',
-                        onSeeAllTap: () {},
+                        onSeeAllTap: () {
+                          controller.selectCategory(controller.allCategory);
+                        },
                       ),
                     ),
                     SizedBox(height: 12.h),
-                    SizedBox(
-                      height: 90.h,
-                      child: ListView.builder(
-                        scrollDirection: Axis.horizontal,
-                        padding: EdgeInsets.symmetric(horizontal: 16.w),
-                        itemCount: controller.categories.length,
-                        itemBuilder: (context, index) {
-                          return Padding(
-                            padding: EdgeInsets.only(right: 14.w),
-                            child: CategoryItemWidget(
-                              category: controller.categories[index],
+                    GetBuilder<HomeController>(
+                      id: 'categories',
+                      builder: (controller) {
+                        final categories = controller.categoriesWithAll;
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            SizedBox(
+                              height: 94.h,
+                              child: ListView.builder(
+                                scrollDirection: Axis.horizontal,
+                                padding: EdgeInsets.symmetric(horizontal: 16.w),
+                                itemCount: categories.length,
+                                itemBuilder: (context, index) {
+                                  final category = categories[index];
+                                  return Padding(
+                                    padding: EdgeInsets.only(right: 14.w),
+                                    child: CategoryItemWidget(
+                                      category: category,
+                                      isSelected:
+                                          controller.selectedCategoryId ==
+                                          category.id,
+                                      onTap: () {
+                                        controller.selectCategory(category);
+                                      },
+                                    ),
+                                  );
+                                },
+                              ),
                             ),
-                          );
-                        },
-                      ),
+                            if (controller.categoriesError != null)
+                              Padding(
+                                padding: EdgeInsets.fromLTRB(
+                                  16.w,
+                                  0,
+                                  16.w,
+                                  8.h,
+                                ),
+                                child: Text(
+                                  controller.categoriesError!,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                    color: Colors.red.shade700,
+                                    fontSize: 12.sp,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ),
+                          ],
+                        );
+                      },
                     ),
                     SizedBox(height: 20.h),
                     Padding(
@@ -181,8 +220,12 @@ class _HomeTabContent extends StatelessWidget {
 
                         final products = controller.filteredProducts;
                         if (products.isEmpty) {
-                          return const _ProductsMessage(
-                            message: 'No products found.',
+                          return _ProductsMessage(
+                            message:
+                                controller.selectedCategoryId ==
+                                    HomeController.allCategoryId
+                                ? 'No products found.'
+                                : 'No products found in this category.',
                           );
                         }
 

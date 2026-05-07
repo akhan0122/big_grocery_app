@@ -8,18 +8,30 @@ import 'package:get/get.dart';
 
 class HomeController extends GetxController {
   final HomeRepository _homeRepository = HomeRepository();
+  static const int allCategoryId = 0;
 
   bool isLoadingProducts = false;
+  bool isLoadingCategories = false;
   String? productsError;
+  String? categoriesError;
   String searchQuery = '';
+  int selectedCategoryId = allCategoryId;
   List<ProductModel> apiProducts = [];
   final TextEditingController searchController = TextEditingController();
 
   List<ProductModel> get filteredProducts {
-    final query = searchQuery.trim().toLowerCase();
-    if (query.isEmpty) return apiProducts;
+    Iterable<ProductModel> products = apiProducts;
 
-    return apiProducts.where((product) {
+    if (selectedCategoryId != allCategoryId) {
+      products = products.where(
+        (product) => product.category?.id == selectedCategoryId,
+      );
+    }
+
+    final query = searchQuery.trim().toLowerCase();
+    if (query.isEmpty) return products.toList();
+
+    return products.where((product) {
       final title = product.title?.toLowerCase() ?? '';
       final category = product.category?.name?.toLowerCase() ?? '';
       final description = product.description?.toLowerCase() ?? '';
@@ -29,7 +41,36 @@ class HomeController extends GetxController {
     }).toList();
   }
 
-  List<CategoryModel> categories = [
+  final List<String> _categoryIcons = const [
+    AssetSvg.grocery,
+    AssetSvg.vegetables,
+    AssetSvg.fruits,
+    AssetSvg.beverages,
+    AssetSvg.edibleOil,
+    AssetSvg.household,
+  ];
+
+  final List<Color> _categoryColors = const [
+    Color(0xFFAE80FF),
+    Color(0xFF28B446),
+    Color(0xFFF8644A),
+    Color(0xFFF5BA3C),
+    Color(0xFF0CD4DC),
+    Color(0xFFFF7EB6),
+  ];
+
+  final CategoryModel allCategory = const CategoryModel(
+    id: allCategoryId,
+    name: 'All',
+    svgIcon: AssetSvg.grocery,
+    bgColor: Color(0xFFAE80FF),
+  );
+
+  List<CategoryModel> categories = [];
+
+  List<CategoryModel> get categoriesWithAll => [allCategory, ...categories];
+
+  List<CategoryModel> fallbackCategories = [
     CategoryModel(
       id: 1,
       name: 'Vegetables',
@@ -71,7 +112,33 @@ class HomeController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+    getCategoriesFromApi();
     getProductsFromApi();
+  }
+
+  Future<void> getCategoriesFromApi() async {
+    isLoadingCategories = true;
+    categoriesError = null;
+    update(['categories']);
+
+    try {
+      categories = await _homeRepository.getCategories(
+        icons: _categoryIcons,
+        colors: _categoryColors,
+      );
+      if (categories.isEmpty) {
+        categories = fallbackCategories;
+      }
+    } on ApiException catch (error) {
+      categoriesError = error.message;
+      categories = fallbackCategories;
+    } catch (_) {
+      categoriesError = 'Unable to fetch categories.';
+      categories = fallbackCategories;
+    } finally {
+      isLoadingCategories = false;
+      update(['categories', 'api_products']);
+    }
   }
 
   Future<void> getProductsFromApi() async {
@@ -94,6 +161,11 @@ class HomeController extends GetxController {
   void updateSearchQuery(String value) {
     searchQuery = value;
     update(['api_products']);
+  }
+
+  void selectCategory(CategoryModel category) {
+    selectedCategoryId = category.id;
+    update(['categories', 'api_products']);
   }
 
   @override
