@@ -7,6 +7,7 @@ import 'package:biggroceryapp/features/home/logic/home_controller.dart';
 import 'package:biggroceryapp/features/home/model/api_product_model.dart';
 import 'package:biggroceryapp/features/home/presentation/categories_screen.dart';
 import 'package:biggroceryapp/features/home/presentation/home_sceen.dart';
+import 'package:biggroceryapp/features/home/presentation/order_success_screen.dart';
 import 'package:biggroceryapp/features/home/presentation/payment_method_screen.dart';
 import 'package:biggroceryapp/features/home/presentation/cart_screen.dart';
 import 'package:biggroceryapp/features/home/presentation/favorites_screen.dart';
@@ -112,6 +113,11 @@ class AppRouter {
           _register<HomeController>(() => HomeController());
           return null;
         },
+      ),
+      GoRoute(
+        path: AppRoutes.orderSuccess,
+        name: AppRoutes.orderSuccess,
+        builder: (context, state) => const OrderSuccessScreen(),
       ),
       GoRoute(
         path: AppRoutes.profileScreen,

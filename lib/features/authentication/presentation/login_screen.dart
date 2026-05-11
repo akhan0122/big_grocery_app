@@ -151,7 +151,7 @@ class LoginScreen extends StatelessWidget {
                                   ),
                                   SizedBox(width: 10.w),
                                   Text(
-                                    'Loading home...',
+                                    'Loading...',
                                     style: TextStyle(
                                       color: Colors.white,
                                       fontSize: 18.sp,

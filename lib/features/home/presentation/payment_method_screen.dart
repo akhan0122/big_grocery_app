@@ -1,7 +1,9 @@
 import 'package:biggroceryapp/core/global_widgets/app_elevated_button.dart';
 import 'package:biggroceryapp/core/global_widgets/app_text.dart';
 import 'package:biggroceryapp/core/global_widgets/custom_appbar_widget.dart';
+import 'package:biggroceryapp/core/services/app_router.dart';
 import 'package:biggroceryapp/core/utils/app_colors.dart';
+import 'package:biggroceryapp/core/utils/app_routes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
@@ -13,7 +15,7 @@ class PaymentMethodScreen extends StatefulWidget {
 }
 
 class _PaymentMethodScreenState extends State<PaymentMethodScreen> {
-  int _currentStep = 2;
+  int _currentStep = 0;
   int _selectedMethod = 1;
   bool _saveCard = true;
 
@@ -357,7 +359,7 @@ class _PaymentStepForm extends StatelessWidget {
             fontSize: 15.sp,
             fontWeight: FontWeight.w700,
           ),
-          onPressed: () {},
+          onPressed: () => AppRouter.push(AppRoutes.orderSuccess),
         ),
       ],
     );
