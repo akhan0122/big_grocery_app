@@ -45,27 +45,28 @@ class LandingScreen extends GetView<LandingController> {
                         ),
                       ),
                     ),
-                  ),
-                  SafeArea(
-                    child: Align(
-                      alignment: Alignment.topRight,
-                      child: Padding(
-                        padding: EdgeInsets.only(top: 8.h, right: 14.w),
-                        child: TextButton(
-                          onPressed: () => AppRouter.go(AppRoutes.loginScreen),
-                          style: TextButton.styleFrom(
-                            foregroundColor: Colors.black87,
-                            textStyle: TextStyle(
-                              fontSize: 16.sp,
-                              fontWeight: FontWeight.w600,
+                    SafeArea(
+                      child: Align(
+                        alignment: Alignment.topRight,
+                        child: Padding(
+                          padding: EdgeInsets.only(top: 8.h, right: 14.w),
+                          child: TextButton(
+                            onPressed: () =>
+                                AppRouter.go(AppRoutes.loginScreen),
+                            style: TextButton.styleFrom(
+                              foregroundColor: Colors.black87,
+                              textStyle: TextStyle(
+                                fontSize: 16.sp,
+                                fontWeight: FontWeight.w600,
+                              ),
                             ),
+                            child: const Text('Skip'),
                           ),
-                          child: const Text('Skip'),
                         ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
 

@@ -258,10 +258,6 @@ class HomeController extends GetxController {
 
     cartQuantities[id] = (cartQuantities[id] ?? 0) + 1;
     _updateProductState(product);
-    _updateProduct(
-      product,
-      product.copyWith(quantity: product.quantity + 1, isAddedToCart: true),
-    );
   }
 
   void decreaseQty(ProductModel product) {
