@@ -194,9 +194,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               AppText(
-                                text: cartQuantity == 0
-                                    ? 'Add to cart'
-                                    : 'Added ($cartQuantity)',
+                                text: 'Add to cart',
                                 color: Colors.white,
                                 fontSize: 18.sp,
                                 fontWeight: FontWeight.w600,
